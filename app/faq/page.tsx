@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const faqs = [
+export const faqs = [
   {
     id: "booking",
     number: "01",

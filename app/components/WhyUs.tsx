@@ -30,6 +30,7 @@ export default function WhyUs() {
   const sectionRef = useRef<HTMLElement>(null);
 
   const [visible, setVisible] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -53,6 +54,18 @@ export default function WhyUs() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+
+    if (!mediaQuery.matches) return;
+
+    const interval = window.setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % services.length);
+    }, 2600);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
   return (
     <section
       ref={sectionRef}
@@ -74,9 +87,73 @@ export default function WhyUs() {
         </h2>
       </div>
 
-      {/* CARDS */}
+      {/* MOBILE CAROUSEL */}
 
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 md:grid-cols-3 md:gap-5">
+      <div className="mx-auto max-w-[420px] md:hidden">
+        <div className="overflow-hidden rounded-[30px]">
+          <div
+            className="flex transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)]"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {services.map((service, index) => (
+              <article
+                key={service.title}
+                className="group relative h-[500px] min-w-full overflow-hidden rounded-[30px] border-2 border-white/80 bg-[#49372D] shadow-[0_18px_38px_rgba(73,55,45,0.18)]"
+              >
+                <img
+                  src={service.image}
+                  alt={service.title}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-[#20140de8] via-[#20140d45] to-[#20140d0a]" />
+
+                <div className="absolute left-5 right-5 top-5 z-10 flex items-center justify-between">
+                  <p className="rounded-full border border-white/50 bg-[#49372D]/35 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#F5F1E8] backdrop-blur-sm">
+                    0{index + 1}
+                  </p>
+                </div>
+
+                <div className="absolute inset-x-0 bottom-0 z-10 p-5">
+                  <p className="mb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-[#B9DCEF]">
+                    {service.label}
+                  </p>
+
+                  <h3 className="vintage-title text-[30px] leading-[0.94] text-[#F5F1E8]">
+                    {service.title}
+                  </h3>
+
+                  <p className="mt-3 text-[12px] font-medium leading-5 text-[#EADAC8]">
+                    {service.text}
+                  </p>
+
+                  <div className="mt-4 pt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white/70">
+                    <span>Electric freedom</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 flex justify-center gap-2">
+          {services.map((service, index) => (
+            <button
+              key={service.title}
+              type="button"
+              aria-label={`Show slide ${index + 1}`}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-2.5 rounded-full transition-all duration-300 ${
+                currentSlide === index ? "w-8 bg-[#49372D]" : "w-2.5 bg-[#49372D]/35"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* DESKTOP CARDS */}
+
+      <div className="mx-auto hidden max-w-6xl grid-cols-1 gap-5 md:grid md:grid-cols-3 md:gap-5">
         {services.map((service, index) => (
           <article
             key={service.title}

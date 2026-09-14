@@ -1,48 +1,58 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import { faqs } from "../faq/page";
 
 export default function FaqImageSection() {
+  const [showAll, setShowAll] = useState(false);
+  const visibleFaqs = showAll ? faqs : faqs.slice(0, 5);
+
   return (
-    <section className="faq-image-section">
-
-      <div className="faq-image-container">
-
-        <Link
-          href="/faq"
-          className="faq-image-card group"
-          aria-label="Go to FAQs"
-        >
-
-          {/* IMAGE - ORIGINAL RATIO */}
-          <img
-            src="/images/faq.jpg"
-            alt="ECO KEPHYRA FAQs"
-            className="faq-image"
-          />
-
-          {/* LIGHT OVERLAY */}
-          <div className="faq-image-overlay" />
-
-          {/* CENTER CONTENT */}
-          <div className="faq-image-content">
-
-            <div className="faq-image-content-inner">
-
-              <p className="faq-image-small">
-                Need to know something?
-              </p>
-
-              <h2 className="faq-image-title">
-                FAQS
-              </h2>
-
-            </div>
-
+    <section className="home-faq-section bg-[#B9DCEF] px-6 pb-20 pt-12 md:px-12 md:pb-28 md:pt-16">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-8 flex items-end justify-between gap-5">
+          <div>
+            <p className="vintage-label text-[#526B61]">Questions & answers</p>
+            <h2 className="home-faq-heading vintage-title mt-3 text-[#49372D]">
+              BEFORE
+              <br />
+              YOU RIDE
+            </h2>
           </div>
 
-        </Link>
+          <span className="hidden font-serif text-sm italic text-[#526B61] md:block">
+            {showAll ? "All answers open" : "5 essential answers"}
+          </span>
+        </div>
 
+        <div className="space-y-4">
+          {visibleFaqs.map((faq) => (
+            <details key={faq.id} id={faq.id} className="home-faq-card faq-detail-card group">
+              <summary className="faq-detail-summary">
+                <span className="faq-detail-number">{faq.number}</span>
+                <span className="faq-detail-question">{faq.question}</span>
+                <span className="faq-detail-plus">+</span>
+              </summary>
+
+              <div className="faq-detail-answer">
+                <div className="faq-answer-line" />
+                <p>{faq.answer}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+
+        <div className="mt-5 flex justify-start">
+          <button
+            type="button"
+            onClick={() => setShowAll((prev) => !prev)}
+            className="border-0 bg-transparent p-0 text-left font-medium uppercase tracking-[0.08em] text-[#49372D] transition-opacity hover:opacity-80"
+            aria-expanded={showAll}
+          >
+            {showAll ? "See less" : "See more"}
+          </button>
+        </div>
       </div>
-
     </section>
   );
 }
