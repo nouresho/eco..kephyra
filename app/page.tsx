@@ -1,6 +1,98 @@
+import Link from "next/link";
 import WhyUs from "./components/WhyUs";
 import WavyDivider from "./components/WavyDivider";
-import FaqPreview from "./components/FaqImageSection";
+
+
+const homeFaqs = [
+  {
+    number: "01",
+    question: "Do I need to book in advance?",
+    answer:
+      "Yes, advance booking is highly recommended. Check the available dates first, then choose your rental period.",
+  },
+  {
+    number: "02",
+    question: "What is the scooter’s top speed?",
+    answer:
+      "The scooter can reach a top speed of 50 km/h.",
+  },
+  {
+    number: "03",
+    question: "Is there a deposit?",
+    answer:
+      "Yes. Your ID is held as a security deposit during the rental period and returned when the scooter is returned in the same condition.",
+  },
+  {
+    number: "04",
+    question: "How long does the battery take to charge?",
+    answer:
+      "The battery takes approximately 3 hours maximum to fully charge. A charger is provided with the scooter. Please do not leave the scooter charging for more than 10 hours.",
+  },
+  {
+    number: "05",
+    question: "Do you provide helmets?",
+    answer:
+      "Yes. We provide high-quality helmets. Every helmet is cleaned and sanitized after each use.",
+  },
+  {
+    number: "06",
+    question: "Will you show me how to use the scooter?",
+    answer:
+      "Yes. Before you start your rental, we provide a tutorial at collection so you know how to use the scooter safely and comfortably.",
+  },
+  {
+    number: "07",
+    question: "Can the scooter carry two people?",
+    answer:
+      "Yes. The scooter is designed for two people and includes a rear backrest for extra comfort. It has enough power to carry two people weighing 80 kg or more each.",
+  },
+  {
+    number: "08",
+    question: "Can the scooter handle the hills around Tamraght and Taghazout?",
+    answer:
+      "Yes. The scooter can handle the hills and slopes around Tamraght and Taghazout. It has Eco and Sport modes, and even Eco mode can carry two people weighing 80 kg or more each.",
+  },
+  {
+    number: "09",
+    question: "Do you offer scooter delivery?",
+    answer:
+      "Yes. Delivery is available within Tamraght. For locations outside Tamraght, or if you are renting more than one scooter, collection is available at our location in Tamraght.",
+  },
+  {
+    number: "10",
+    question: "Can I take the scooter on longer trips?",
+    answer:
+      "Yes. You can explore places such as Paradise Valley, Agadir, Imsouane, Taghazout, Anza and Aourir. Make sure the battery is fully charged before leaving and plan where you can recharge during your trip. You are responsible for planning your battery usage, and EKO KIVARA cannot be held responsible if the battery runs out in a remote location due to poor planning.",
+  },
+  {
+    number: "11",
+    question: "What should I do in case of an accident or damage?",
+    answer:
+      "Please inform us immediately if an accident or damage occurs. Do not attempt to repair or modify the scooter without our permission. We will assess the situation and find the appropriate solution on a case-by-case basis.",
+  },
+];
+
+/*
+  TEMPORARY PLACEHOLDER REVIEWS
+  Replace these with real customer reviews later.
+*/
+const reviews = [
+  {
+    name: "Sarah M.",
+    rating: 5,
+    text: "Super easy to book and the scooter was perfect for exploring the coast.",
+  },
+  {
+    name: "Adam R.",
+    rating: 5,
+    text: "We rode from Tamraght to Taghazout. Smooth, quiet and such a fun experience.",
+  },
+  {
+    name: "Lina K.",
+    rating: 5,
+    text: "The team explained everything before the ride and made the whole experience really easy.",
+  },
+];
 
 export default function Home() {
   return (
@@ -10,13 +102,8 @@ export default function Home() {
       {/* ================================================= */}
 
       <section className="hero-home relative overflow-hidden bg-[#F3EFE7]">
-        {/* ================================================= */}
         {/* DESKTOP HERO */}
-        {/* ================================================= */}
-
         <div className="relative hidden min-h-[calc(100vh-100px)] md:block">
-          {/* BLUE WAVE BACKGROUND */}
-
           <div className="pointer-events-none absolute inset-0 z-0">
             <svg
               viewBox="0 0 1440 900"
@@ -38,17 +125,11 @@ export default function Home() {
             </svg>
           </div>
 
-          {/* LOGO TOP CENTER */}
-
           <div className="hero-logo-desktop">
             <img src="/images/logo.png" alt="ECO KEPHYRA" />
           </div>
 
-          {/* HERO CONTENT */}
-
           <div className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] max-w-7xl items-center gap-10 px-10 pb-14 pt-[120px] lg:gap-16 lg:px-12">
-            {/* LEFT CONTENT */}
-
             <div className="flex flex-1 items-center">
               <div>
                 <h1 className="hero-main-title">
@@ -58,7 +139,6 @@ export default function Home() {
 
                   <span className="hero-title-line hero-title-line--two relative block">
                     SCOOTERS
-
                     <span className="hero-script-word">for</span>
                   </span>
 
@@ -67,15 +147,11 @@ export default function Home() {
                   </span>
                 </h1>
 
-                {/* SAME FONT AS "for" */}
-
                 <p className="hero-home-caption hero-caption-typing hero-tagline-script">
                   No fuel. No smoke. No pollution.
                 </p>
               </div>
             </div>
-
-            {/* RIGHT VIDEO PHONE */}
 
             <div className="flex shrink-0 justify-center">
               <div className="phone-wrapper">
@@ -98,13 +174,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ================================================= */}
         {/* MOBILE HERO */}
-        {/* ================================================= */}
-
         <div className="relative min-h-[calc(100svh-90px)] md:hidden">
-          {/* FULL BACKGROUND VIDEO */}
-
           <video
             className="absolute inset-0 h-full w-full object-cover"
             autoPlay
@@ -116,17 +187,11 @@ export default function Home() {
             <source src="/videos/intro.mp4" type="video/mp4" />
           </video>
 
-          {/* OVERLAY */}
-
           <div className="absolute inset-0 z-[1] bg-[#49372D]/25" />
-
-          {/* MOBILE LOGO TOP CENTER */}
 
           <div className="hero-logo-mobile">
             <img src="/images/logo.png" alt="ECO KEPHYRA" />
           </div>
-
-          {/* MOBILE CONTENT */}
 
           <div className="relative z-10 flex min-h-[calc(100svh-90px)] items-center justify-center px-4 pb-16 pt-[125px] text-center">
             <div className="w-full">
@@ -137,7 +202,6 @@ export default function Home() {
 
                 <span className="hero-title-line hero-title-line--two relative block">
                   SCOOTERS
-
                   <span className="hero-mobile-script">for</span>
                 </span>
 
@@ -145,8 +209,6 @@ export default function Home() {
                   RENTAL
                 </span>
               </h1>
-
-              {/* SAME FONT AS "for" */}
 
               <p className="hero-mobile-caption hero-caption-typing hero-tagline-script">
                 No fuel. No smoke. No pollution.
@@ -159,124 +221,440 @@ export default function Home() {
       </section>
 
       {/* ================================================= */}
-      {/* WHY US */}
+      {/* WHY CHOOSE US */}
       {/* ================================================= */}
 
       <div className="relative z-30 bg-[#F5F1E8] pt-[60px] md:pt-[85px]">
         <WhyUs />
-
-        <WavyDivider color="#B9DCEF" />
       </div>
 
       {/* ================================================= */}
-      {/* FAQ PREVIEW */}
+      {/* FAQs DIRECTLY ON HOME */}
       {/* ================================================= */}
 
-      <FaqPreview />
-
-      {/* ================================================= */}
-      {/* SCOOTER PREVIEW */}
-      {/* ================================================= */}
-
-      <section className="vintage-section relative z-10 bg-[#DCE4C8] px-6 pb-32 pt-[150px] md:px-12">
-        <div className="mx-auto grid max-w-7xl items-center gap-14 md:grid-cols-[1.1fr_0.9fr]">
-          {/* IMAGE */}
-
-          <div className="relative">
-            <div className="overflow-hidden rounded-[24px] border-2 border-[#49372D] shadow-[8px_8px_0_#49372D]">
-              <img
-                src="/images/scooter-preview.jpg"
-                alt="ECO KEPHYRA electric scooter"
-                className="vintage-image h-[520px] w-full object-cover"
-              />
-            </div>
-
-            <div className="absolute -bottom-6 -right-3 rotate-[-5deg] border-2 border-[#49372D] bg-[#B9DCEF] px-6 py-4 shadow-[4px_4px_0_#49372D]">
-              <p className="vintage-label text-[#49372D]">Ride local</p>
-            </div>
-          </div>
-
-          {/* TEXT */}
-
-          <div>
-            <p className="vintage-label text-[#66705C]">
-              Your next adventure
+      <section className="bg-[#F5F1E8] px-5 py-24 md:px-10 md:py-32 lg:px-14">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-14 text-center md:mb-20">
+            <p className="vintage-label text-[#6F7F73]">
+              Before you ride
             </p>
 
-            <h2 className="vintage-title retro-shadow mt-5 text-[58px] text-[#49372D] md:text-[82px]">
-              MORE
-              <br />
-              THAN A
-              <br />
-              RIDE.
+            <h2 className="vintage-title retro-shadow mt-5 text-[58px] text-[#49372D] sm:text-[72px] md:text-[96px]">
+              QUESTIONS?
             </h2>
 
-            <p className="mt-7 max-w-md border-l-2 border-[#49372D] pl-5 text-sm font-medium leading-7 text-[#66705C] md:text-base">
-              Classic style meets electric freedom. Explore the region slowly,
-              quietly and differently.
+            <p className="mx-auto mt-5 max-w-lg text-sm font-medium leading-7 text-[#6F7F73]">
+              Everything you need to know before starting your electric
+              adventure.
             </p>
+          </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              {[
-                "Electric",
-                "Eco Friendly",
-                "Easy To Ride",
-                "Local",
-              ].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border-2 border-[#49372D] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#49372D]"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
+          <div className="border-t border-[#49372D]/20">
+            {homeFaqs.map((faq) => (
+              <details
+                key={faq.number}
+                className="group border-b border-[#49372D]/20"
+              >
+                <summary className="flex cursor-pointer list-none items-center gap-5 py-7 md:gap-8 md:py-9">
+                  <span className="w-8 shrink-0 text-[10px] font-bold tracking-[0.16em] text-[#6F7F73]">
+                    {faq.number}
+                  </span>
 
-            <a
-              href="/scooters"
-              className="retro-button mt-9 bg-[#B9DCEF] px-7 py-4 text-xs text-[#49372D]"
-            >
-              Discover Scooters
-            </a>
+                  <h3 className="flex-1 text-left text-[18px] font-bold leading-tight tracking-[-0.025em] text-[#49372D] md:text-[25px]">
+                    {faq.question}
+                  </h3>
+
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#49372D]/25 text-xl font-light text-[#49372D] transition-transform duration-300 group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+
+                <div className="pb-8 pl-[52px] pr-12 md:pb-10 md:pl-[64px]">
+                  <p className="max-w-3xl text-sm font-medium leading-7 text-[#6F7F73] md:text-base">
+                    {faq.answer}
+                  </p>
+                </div>
+              </details>
+            ))}
           </div>
         </div>
-
-        <WavyDivider color="#6B4935" />
       </section>
 
       {/* ================================================= */}
-      {/* FINAL CTA — READY TO RIDE */}
+      {/* HOW TO BOOK */}
       {/* ================================================= */}
 
-      <section className="ready-ride-section relative overflow-hidden px-6 pb-28 pt-36 text-center md:px-12 md:pb-36 md:pt-44">
-        {/* BACKGROUND PHOTO */}
+      <section className="bg-[#B9DCEF] px-5 py-24 md:px-10 md:py-32 lg:px-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-14 md:mb-20">
+            <p className="vintage-label text-[#526B61]">
+              Two easy ways
+            </p>
 
-        <div className="ready-ride-bg" />
+            <h2 className="vintage-title retro-shadow mt-5 text-[60px] text-[#49372D] sm:text-[78px] md:text-[105px]">
+              HOW TO
+              <br />
+              BOOK.
+            </h2>
+          </div>
 
-        {/* OVERLAY */}
+          <div className="grid gap-5 lg:grid-cols-2">
+            {/* ONLINE */}
+            <article className="flex min-h-[500px] flex-col justify-between rounded-[30px] bg-[#F5F1E8] p-7 md:p-10">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6F7F73]">
+                    01
+                  </span>
 
-        <div className="ready-ride-overlay" />
+                  <span className="rounded-full border border-[#49372D]/20 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#49372D]">
+                    Online
+                  </span>
+                </div>
 
-        {/* CONTENT */}
+                <h3 className="mt-12 text-[38px] font-black uppercase leading-[0.92] tracking-[-0.045em] text-[#49372D] md:text-[52px]">
+                  Online
+                  <br />
+                  Booking
+                </h3>
 
-        <div className="relative z-10 mx-auto max-w-5xl">
-          <p className="vintage-label text-[#DCE4C8]">
-            Road calling?
+                <p className="mt-7 max-w-lg text-sm font-medium leading-7 text-[#6F7F73] md:text-base">
+                  Choose your available dates, select your rental period and
+                  number of scooters, enter your details, and pay securely
+                  online.
+                </p>
+              </div>
+
+              <div className="mt-12 border-t border-[#49372D]/15 pt-7">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-3 text-[9px] font-bold uppercase tracking-[0.12em] text-[#49372D]">
+                  <span>Dates</span>
+                  <span className="opacity-30">→</span>
+                  <span>Scooters</span>
+                  <span className="opacity-30">→</span>
+                  <span>Details</span>
+                  <span className="opacity-30">→</span>
+                  <span>Payment</span>
+                </div>
+              </div>
+            </article>
+
+            {/* CASH */}
+            <article className="flex min-h-[500px] flex-col justify-between rounded-[30px] bg-[#49372D] p-7 text-[#F5F1E8] md:p-10">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#B9DCEF]">
+                    02
+                  </span>
+
+                  <span className="rounded-full border border-white/20 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#F5F1E8]">
+                    Cash
+                  </span>
+                </div>
+
+                <h3 className="mt-12 text-[38px] font-black uppercase leading-[0.92] tracking-[-0.045em] md:text-[52px]">
+                  Cash
+                  <br />
+                  Payment
+                </h3>
+
+                <p className="mt-7 max-w-lg text-sm font-medium leading-7 text-[#EADAC8] md:text-base">
+                  Choose the days you would like to rent your scooter and share
+                  them with us on WhatsApp. We&apos;ll coordinate with you and
+                  complete your booking through WhatsApp, guiding you through
+                  the steps needed to confirm your chosen dates.
+                </p>
+
+                <p className="mt-4 max-w-lg text-sm font-medium leading-7 text-[#EADAC8] md:text-base">
+                  You can then visit our location in Tamraght, collect your
+                  scooter, and pay in cash upon collection.
+                </p>
+              </div>
+
+              <div className="mt-12 border-t border-white/15 pt-7">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-3 text-[9px] font-bold uppercase tracking-[0.12em] text-[#B9DCEF]">
+                  <span>Dates</span>
+                  <span className="opacity-40">→</span>
+                  <span>WhatsApp</span>
+                  <span className="opacity-40">→</span>
+                  <span>Confirm</span>
+                  <span className="opacity-40">→</span>
+                  <span>Collect & Pay</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================= */}
+      {/* QUICK BOOKING */}
+      {/* ================================================= */}
+
+      <section className="bg-[#DCE4C8] px-5 py-24 md:px-10 md:py-32 lg:px-14">
+        <div className="mx-auto max-w-6xl text-center">
+          <p className="vintage-label text-[#6F7F73]">
+            Quick booking
           </p>
 
-          <h2 className="vintage-title retro-shadow mt-6 text-[65px] text-[#FFF8EC] md:text-[105px]">
-            READY
+          <h2 className="vintage-title retro-shadow mt-5 text-[58px] text-[#49372D] sm:text-[76px] md:text-[100px]">
+            READY WHEN
             <br />
-            TO RIDE?
+            YOU ARE.
           </h2>
 
-          <p className="mx-auto mt-7 max-w-lg text-sm font-medium leading-7 text-[#F5F1E8] md:text-base">
-            Your electric adventure starts here. Pick your scooter and make the
-            road yours.
+          <p className="mx-auto mt-6 max-w-md text-sm font-medium leading-7 text-[#66705C]">
+            Check your dates online or contact us directly on WhatsApp.
           </p>
 
-          <a href="/reservation" className="ready-ride-button">
-            BOOK
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link
+              href="/date-availability"
+              className="inline-flex min-w-[230px] items-center justify-between rounded-full bg-[#49372D] px-7 py-4 text-[10px] font-bold uppercase tracking-[0.13em] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#6F7F73]"
+            >
+              Check availability
+              <span>↗</span>
+            </Link>
+
+            {/* REPLACE NUMBER WITH REAL WHATSAPP NUMBER */}
+            <a
+              href="https://wa.me/212600000000"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-w-[230px] items-center justify-between rounded-full border-2 border-[#49372D] px-7 py-[14px] text-[10px] font-bold uppercase tracking-[0.13em] text-[#49372D] transition-all duration-300 hover:-translate-y-1 hover:bg-[#49372D] hover:text-white"
+            >
+              WhatsApp
+              <span>↗</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================= */}
+      {/* REVIEWS */}
+      {/* ================================================= */}
+
+      <section className="bg-[#F5F1E8] px-5 py-24 md:px-10 md:py-32 lg:px-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-14 md:flex md:items-end md:justify-between">
+            <div>
+              <p className="vintage-label text-[#6F7F73]">
+                From the road
+              </p>
+
+              <h2 className="vintage-title retro-shadow mt-5 text-[58px] text-[#49372D] sm:text-[74px] md:text-[92px]">
+                WHAT RIDERS
+                <br />
+                SAY.
+              </h2>
+            </div>
+
+            <p className="mt-5 max-w-sm text-sm font-medium leading-7 text-[#6F7F73] md:mt-0">
+              Experiences shared by people who explored the coast on two
+              electric wheels.
+            </p>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {reviews.map((review, index) => (
+              <article
+                key={review.name}
+                className={`flex min-h-[330px] flex-col justify-between rounded-[26px] p-7 md:p-8 ${
+                  index === 1
+                    ? "bg-[#B9DCEF]"
+                    : index === 2
+                      ? "bg-[#DCE4C8]"
+                      : "bg-white"
+                }`}
+              >
+                <div>
+                  <div className="text-[15px] tracking-[0.12em] text-[#49372D]">
+                    {"★".repeat(review.rating)}
+                  </div>
+
+                  <p className="mt-8 text-[20px] font-bold leading-8 tracking-[-0.025em] text-[#49372D]">
+                    “{review.text}”
+                  </p>
+                </div>
+
+                <div className="mt-10 border-t border-[#49372D]/15 pt-5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6F7F73]">
+                    {review.name}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================= */}
+      {/* ADD REVIEW */}
+      {/* UI ONLY UNTIL CONNECTED TO BACKEND */}
+      {/* ================================================= */}
+
+      <section className="bg-[#49372D] px-5 py-24 text-[#F5F1E8] md:px-10 md:py-32 lg:px-14">
+        <div className="mx-auto grid max-w-6xl gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+          <div>
+            <p className="vintage-label text-[#B9DCEF]">
+              Your turn
+            </p>
+
+            <h2 className="vintage-title mt-5 text-[58px] text-[#F5F1E8] md:text-[82px]">
+              ADD YOUR
+              <br />
+              REVIEW.
+            </h2>
+
+            <p className="mt-6 max-w-sm text-sm font-medium leading-7 text-[#EADAC8]">
+              Had a ride with us? Share your experience with future riders.
+            </p>
+          </div>
+
+          <form className="space-y-5">
+            <div>
+              <label
+                htmlFor="review-name"
+                className="mb-3 block text-[9px] font-bold uppercase tracking-[0.16em] text-[#B9DCEF]"
+              >
+                Your name
+              </label>
+
+              <input
+                id="review-name"
+                name="name"
+                type="text"
+                placeholder="Your name"
+                className="w-full border-b border-white/25 bg-transparent px-0 py-4 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#B9DCEF]"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="review-rating"
+                className="mb-3 block text-[9px] font-bold uppercase tracking-[0.16em] text-[#B9DCEF]"
+              >
+                Rating
+              </label>
+
+              <select
+                id="review-rating"
+                name="rating"
+                defaultValue="5"
+                className="w-full border-b border-white/25 bg-[#49372D] px-0 py-4 text-sm text-white outline-none transition-colors focus:border-[#B9DCEF]"
+              >
+                <option value="5">★★★★★ — 5/5</option>
+                <option value="4">★★★★☆ — 4/5</option>
+                <option value="3">★★★☆☆ — 3/5</option>
+                <option value="2">★★☆☆☆ — 2/5</option>
+                <option value="1">★☆☆☆☆ — 1/5</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="review-message"
+                className="mb-3 block text-[9px] font-bold uppercase tracking-[0.16em] text-[#B9DCEF]"
+              >
+                Your review
+              </label>
+
+              <textarea
+                id="review-message"
+                name="review"
+                rows={5}
+                placeholder="Tell us about your ride..."
+                className="w-full resize-none border-b border-white/25 bg-transparent px-0 py-4 text-sm leading-7 text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#B9DCEF]"
+              />
+            </div>
+
+            <button
+              type="button"
+              className="mt-5 inline-flex items-center gap-8 rounded-full bg-[#B9DCEF] px-7 py-4 text-[10px] font-bold uppercase tracking-[0.13em] text-[#49372D] transition-all duration-300 hover:-translate-y-1 hover:bg-[#DCE4C8]"
+            >
+              Submit review
+              <span>↗</span>
+            </button>
+
+            <p className="text-[9px] leading-5 text-white/35">
+              Review submission will work once this form is connected to your
+              database/backend.
+            </p>
+          </form>
+        </div>
+      </section>
+
+      {/* ================================================= */}
+      {/* FIND US */}
+      {/* ================================================= */}
+
+      <section className="bg-[#B9DCEF] px-5 pb-16 pt-24 md:px-10 md:pb-20 md:pt-32 lg:px-14">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid items-end gap-8 md:grid-cols-[1fr_0.55fr]">
+            <div>
+              <p className="vintage-label text-[#526B61]">
+                Come say hi
+              </p>
+
+              <h2 className="vintage-title retro-shadow mt-5 text-[64px] text-[#49372D] sm:text-[82px] md:text-[110px]">
+                FIND US
+                <br />
+                IN TAMRAGHT.
+              </h2>
+            </div>
+
+            <div className="md:pb-3">
+              <p className="text-[20px] font-bold tracking-[-0.025em] text-[#49372D]">
+                Tamraght, Morocco
+              </p>
+
+              <p className="mt-3 max-w-sm text-sm font-medium leading-7 text-[#526B61]">
+                Close to the beach and ready for your next coastal ride.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {["Tamraght", "Coast", "Morocco"].map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full border border-[#49372D]/25 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================= */}
+      {/* TAMRAGHT MAP */}
+      {/* ================================================= */}
+
+      <section className="bg-[#B9DCEF] px-5 pb-24 md:px-10 md:pb-32 lg:px-14">
+        <div className="mx-auto max-w-7xl overflow-hidden rounded-[30px] border-2 border-[#49372D] bg-[#F5F1E8] shadow-[8px_8px_0_#49372D]">
+          <iframe
+            title="Tamraght Map"
+            src="https://www.google.com/maps?q=Tamraght%2C%20Morocco&output=embed"
+            width="100%"
+            height="520"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="block w-full border-0"
+          />
+        </div>
+
+        <div className="mx-auto mt-5 flex max-w-7xl items-center justify-between gap-4">
+          <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#526B61]">
+            Tamraght · Morocco
+          </p>
+
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=Tamraght%2C%20Morocco"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#49372D] underline underline-offset-4"
+          >
+            Open map ↗
           </a>
         </div>
       </section>
