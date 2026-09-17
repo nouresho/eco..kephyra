@@ -1,12 +1,79 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
-const quickDurations = [1, 3, 5, 7];
+/* ================================================= */
+/* TEMPORARY UNAVAILABLE DATES
+/* Later these dates will come from your database/API.
+/* ================================================= */
+
+const unavailableDates = [
+  "2026-09-01",
+  "2026-09-02",
+  "2026-09-03",
+  "2026-09-04",
+  "2026-09-05",
+  "2026-09-06",
+];
+
+/* ================================================= */
+/* HELPERS */
+/* ================================================= */
+
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const WEEK_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+
+function toDateKey(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function createDate(year: number, month: number, day: number) {
+  return new Date(year, month, day, 12, 0, 0, 0);
+}
+
+function isSameDate(date1: Date | null, date2: Date | null) {
+  if (!date1 || !date2) return false;
+
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+function startOfDay(date: Date) {
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    12,
+    0,
+    0,
+    0
+  );
+}
 
 function formatDate(date: Date | null) {
-  if (!date) return "Select date";
+  if (!date) return "Not selected";
 
   return new Intl.DateTimeFormat("en-US", {
     day: "2-digit",
@@ -15,369 +82,766 @@ function formatDate(date: Date | null) {
   }).format(date);
 }
 
-function toInputDate(date: Date | null) {
-  if (!date) return "";
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function parseInputDate(value: string) {
-  if (!value) return null;
-
-  const [year, month, day] = value.split("-").map(Number);
-
-  return new Date(year, month - 1, day);
-}
-
-function addDays(date: Date, days: number) {
-  const newDate = new Date(date);
-  newDate.setDate(newDate.getDate() + days);
-
-  return newDate;
-}
-
 function getRentalDays(startDate: Date | null, endDate: Date | null) {
   if (!startDate || !endDate) return 0;
 
-  const start = new Date(
+  const start = Date.UTC(
     startDate.getFullYear(),
     startDate.getMonth(),
-    startDate.getDate(),
+    startDate.getDate()
   );
 
-  const end = new Date(
+  const end = Date.UTC(
     endDate.getFullYear(),
     endDate.getMonth(),
-    endDate.getDate(),
+    endDate.getDate()
   );
 
-  const difference = end.getTime() - start.getTime();
+  const difference = end - start;
 
   if (difference < 0) return 0;
 
-  return Math.floor(difference / (1000 * 60 * 60 * 24)) + 1;
+  return Math.floor(difference / 86400000) + 1;
 }
 
+function isBetween(
+  date: Date,
+  startDate: Date | null,
+  endDate: Date | null
+) {
+  if (!startDate || !endDate) return false;
+
+  const current = startOfDay(date).getTime();
+  const start = startOfDay(startDate).getTime();
+  const end = startOfDay(endDate).getTime();
+
+  return current > start && current < end;
+}
+
+function rangeContainsUnavailable(
+  startDate: Date,
+  endDate: Date,
+  unavailable: Set<string>
+) {
+  const current = startOfDay(startDate);
+  const end = startOfDay(endDate);
+
+  while (current <= end) {
+    if (unavailable.has(toDateKey(current))) {
+      return true;
+    }
+
+    current.setDate(current.getDate() + 1);
+  }
+
+  return false;
+}
+
+/* ================================================= */
+/* PAGE */
+/* ================================================= */
+
 export default function DateAvailabilityPage() {
+  /*
+   * Demo starts on September 2026 to match your reference.
+   * Later you can change this to:
+   *
+   * const now = new Date();
+   * useState(now.getFullYear());
+   * useState(now.getMonth());
+   */
+
+  const [currentYear, setCurrentYear] = useState(2026);
+  const [currentMonth, setCurrentMonth] = useState(8);
+
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [checked, setChecked] = useState(false);
+
+  const [message, setMessage] = useState(
+    "Select a start date on the calendar."
+  );
+
+  const unavailableSet = useMemo(
+    () => new Set(unavailableDates),
+    []
+  );
 
   const rentalDays = useMemo(
     () => getRentalDays(startDate, endDate),
-    [startDate, endDate],
+    [startDate, endDate]
   );
 
-  const today = toInputDate(new Date());
+  /* ================================================= */
+  /* CALENDAR DAYS */
+  /* ================================================= */
 
-  const handleStartDate = (value: string) => {
-    const date = parseInputDate(value);
+  const calendarDays = useMemo(() => {
+    const firstDay = createDate(currentYear, currentMonth, 1);
 
-    setStartDate(date);
-    setChecked(false);
+    const daysInMonth = new Date(
+      currentYear,
+      currentMonth + 1,
+      0
+    ).getDate();
 
-    if (date && endDate && endDate < date) {
-      setEndDate(null);
+    /*
+     * JS:
+     * Sunday = 0
+     * Monday = 1
+     *
+     * We want Monday first:
+     * Monday = 0 ... Sunday = 6
+     */
+    const offset = (firstDay.getDay() + 6) % 7;
+
+    const cells: (Date | null)[] = [];
+
+    for (let i = 0; i < offset; i++) {
+      cells.push(null);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      cells.push(createDate(currentYear, currentMonth, day));
+    }
+
+    return cells;
+  }, [currentYear, currentMonth]);
+
+  /* ================================================= */
+  /* MONTH NAVIGATION */
+  /* ================================================= */
+
+  const previousMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear((year) => year - 1);
+    } else {
+      setCurrentMonth((month) => month - 1);
     }
   };
 
-  const handleEndDate = (value: string) => {
-    const date = parseInputDate(value);
+  const nextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear((year) => year + 1);
+    } else {
+      setCurrentMonth((month) => month + 1);
+    }
+  };
+
+  /* ================================================= */
+  /* DATE SELECTION */
+  /* ================================================= */
+
+  const handleDateClick = (date: Date) => {
+    const key = toDateKey(date);
+
+    if (unavailableSet.has(key)) {
+      return;
+    }
+
+    /*
+     * No start OR range already completed:
+     * start a new selection.
+     */
+    if (!startDate || endDate) {
+      setStartDate(date);
+      setEndDate(null);
+
+      setMessage("Now select your end date.");
+
+      return;
+    }
+
+    /*
+     * Clicking before current start:
+     * make it the new start.
+     */
+    if (date < startDate) {
+      setStartDate(date);
+      setEndDate(null);
+
+      setMessage("Now select your end date.");
+
+      return;
+    }
+
+    /*
+     * Same start/end date = 1 day rental.
+     */
+    if (isSameDate(date, startDate)) {
+      setEndDate(date);
+
+      setMessage("Your rental period is ready.");
+
+      return;
+    }
+
+    /*
+     * Do not allow a range crossing unavailable dates.
+     */
+    if (
+      rangeContainsUnavailable(
+        startDate,
+        date,
+        unavailableSet
+      )
+    ) {
+      setMessage(
+        "This period includes unavailable dates. Please choose another range."
+      );
+
+      return;
+    }
 
     setEndDate(date);
-    setChecked(false);
+
+    setMessage("Your rental period is ready.");
   };
 
-  const handleQuickSelect = (days: number) => {
-    let start = startDate;
-
-    if (!start) {
-      start = new Date();
-      setStartDate(start);
-    }
-
-    const end = addDays(start, days - 1);
-
-    setEndDate(end);
-    setChecked(false);
-  };
-
-  const handleCheckAvailability = () => {
-    if (!startDate || !endDate || rentalDays <= 0) return;
-
-    setChecked(true);
-  };
+  /* ================================================= */
+  /* RENDER */
+  /* ================================================= */
 
   return (
-    <main className="overflow-hidden bg-[#F7F5EF] text-[#183B48]">
+    <main className="overflow-hidden bg-[#F3EFE7] text-[#49372D]">
+
       {/* ================================================= */}
       {/* HERO */}
       {/* ================================================= */}
 
-      <section className="relative px-5 pb-16 pt-20 md:px-10 md:pb-24 md:pt-28 lg:px-14">
+      <section className="px-5 pb-14 pt-20 md:px-10 md:pb-20 md:pt-28 lg:px-14">
         <div className="mx-auto max-w-7xl">
-          <div className="grid items-end gap-10 lg:grid-cols-[1.15fr_0.85fr]">
-            <div>
-              <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#69BFE3]">
-                Plan your ride
-              </p>
 
-              <h1 className="max-w-4xl text-[58px] font-semibold leading-[0.88] tracking-[-0.06em] text-[#183B48] sm:text-[78px] md:text-[100px] lg:text-[118px]">
-                CHECK
-                <br />
-                YOUR DATES.
-              </h1>
-            </div>
+          <p className="vintage-label text-[#6F7F73]">
+            Plan your ride
+          </p>
 
-            <div className="max-w-md lg:pb-3">
-              <p className="text-sm font-medium leading-7 text-[#183B48]/65 md:text-base">
-                Choose your rental period and see how many days you&apos;ve
-                selected before continuing with your reservation.
-              </p>
-            </div>
+          <div className="mt-5 grid items-end gap-8 lg:grid-cols-[1fr_0.55fr]">
+
+            <h1 className="vintage-title retro-shadow text-[58px] text-[#49372D] sm:text-[78px] md:text-[105px]">
+              CHECK
+              <br />
+              YOUR DATES.
+            </h1>
+
+            <p className="max-w-md text-sm font-medium leading-7 text-[#6F7F73] md:pb-2 md:text-base">
+              Choose your rental period and check which dates
+              are available before continuing with your booking.
+            </p>
+
           </div>
         </div>
       </section>
 
+
       {/* ================================================= */}
-      {/* DATE SELECTION */}
+      {/* CALENDAR */}
       {/* ================================================= */}
 
       <section className="px-5 pb-28 md:px-10 md:pb-36 lg:px-14">
-        <div className="mx-auto max-w-7xl">
-          <div className="overflow-hidden rounded-[32px] border border-[#183B48]/10 bg-white shadow-[0_30px_80px_rgba(24,59,72,0.08)]">
-            <div className="grid lg:grid-cols-[1fr_0.42fr]">
-              {/* LEFT */}
+        <div className="mx-auto max-w-5xl">
 
-              <div className="p-6 sm:p-8 md:p-10 lg:p-12">
-                <div className="mb-10">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#69BFE3]">
-                    Rental period
-                  </p>
+          <div
+            className="
+              overflow-hidden
+              rounded-[34px]
+              border
+              border-[#49372D]/15
+              bg-[#FFFDF8]
+              shadow-[0_25px_70px_rgba(73,55,45,0.10)]
+            "
+          >
+            <div className="p-5 sm:p-8 md:p-10 lg:p-12">
 
-                  <h2 className="mt-3 text-[34px] font-semibold tracking-[-0.045em] text-[#183B48] md:text-[44px]">
-                    Choose your dates
-                  </h2>
-                </div>
+              {/* ================================================= */}
+              {/* MONTH HEADER */}
+              {/* ================================================= */}
 
-                {/* DATE INPUTS */}
+              <div className="flex items-center justify-between gap-4">
 
-                <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
-                  {/* START */}
+                {/* PREVIOUS */}
+                <button
+                  type="button"
+                  onClick={previousMonth}
+                  aria-label="Previous month"
+                  className="
+                    flex
+                    h-12
+                    w-12
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-[#EAD9BC]
+                    text-xl
+                    font-bold
+                    text-[#49372D]
+                    transition-all
+                    duration-300
+                    hover:-translate-x-1
+                    hover:bg-[#DCE4C8]
+                    sm:h-14
+                    sm:w-14
+                  "
+                >
+                  ←
+                </button>
 
-                  <label className="group block">
-                    <span className="mb-3 block text-[9px] font-semibold uppercase tracking-[0.16em] text-[#183B48]/45">
-                      Start date
-                    </span>
 
-                    <div className="rounded-[22px] border border-[#183B48]/10 bg-[#F7F5EF] p-5 transition-all duration-300 focus-within:border-[#69BFE3] focus-within:bg-white focus-within:shadow-[0_12px_30px_rgba(105,191,227,0.12)]">
-                      <input
-                        type="date"
-                        value={toInputDate(startDate)}
-                        min={today}
-                        onChange={(event) =>
-                          handleStartDate(event.target.value)
-                        }
-                        className="w-full cursor-pointer bg-transparent text-[15px] font-semibold text-[#183B48] outline-none"
-                      />
+                {/* MONTH */}
+                <h2
+                  className="
+                    text-center
+                    text-[25px]
+                    font-black
+                    tracking-[-0.045em]
+                    text-[#49372D]
+                    sm:text-[34px]
+                    md:text-[42px]
+                  "
+                >
+                  {MONTHS[currentMonth]} {currentYear}
+                </h2>
 
-                      <p className="mt-2 text-[11px] text-[#183B48]/45">
-                        {formatDate(startDate)}
-                      </p>
-                    </div>
-                  </label>
 
-                  {/* ARROW */}
+                {/* NEXT */}
+                <button
+                  type="button"
+                  onClick={nextMonth}
+                  aria-label="Next month"
+                  className="
+                    flex
+                    h-12
+                    w-12
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-full
+                    bg-[#EAD9BC]
+                    text-xl
+                    font-bold
+                    text-[#49372D]
+                    transition-all
+                    duration-300
+                    hover:translate-x-1
+                    hover:bg-[#DCE4C8]
+                    sm:h-14
+                    sm:w-14
+                  "
+                >
+                  →
+                </button>
 
-                  <div className="hidden pt-6 text-[#183B48]/25 md:block">
-                    →
-                  </div>
-
-                  {/* END */}
-
-                  <label className="group block">
-                    <span className="mb-3 block text-[9px] font-semibold uppercase tracking-[0.16em] text-[#183B48]/45">
-                      End date
-                    </span>
-
-                    <div className="rounded-[22px] border border-[#183B48]/10 bg-[#F7F5EF] p-5 transition-all duration-300 focus-within:border-[#69BFE3] focus-within:bg-white focus-within:shadow-[0_12px_30px_rgba(105,191,227,0.12)]">
-                      <input
-                        type="date"
-                        value={toInputDate(endDate)}
-                        min={startDate ? toInputDate(startDate) : today}
-                        disabled={!startDate}
-                        onChange={(event) =>
-                          handleEndDate(event.target.value)
-                        }
-                        className="w-full cursor-pointer bg-transparent text-[15px] font-semibold text-[#183B48] outline-none disabled:cursor-not-allowed disabled:opacity-35"
-                      />
-
-                      <p className="mt-2 text-[11px] text-[#183B48]/45">
-                        {formatDate(endDate)}
-                      </p>
-                    </div>
-                  </label>
-                </div>
-
-                {/* QUICK SELECT */}
-
-                <div className="mt-10 border-t border-[#183B48]/10 pt-8">
-                  <p className="mb-4 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#183B48]/45">
-                    Quick select
-                  </p>
-
-                  <div className="flex flex-wrap gap-3">
-                    {quickDurations.map((days) => {
-                      const active = rentalDays === days;
-
-                      return (
-                        <button
-                          key={days}
-                          type="button"
-                          onClick={() => handleQuickSelect(days)}
-                          className={`rounded-full border px-5 py-3 text-[11px] font-semibold transition-all duration-300 ${
-                            active
-                              ? "border-[#183B48] bg-[#183B48] text-white"
-                              : "border-[#183B48]/12 bg-[#F7F5EF] text-[#183B48] hover:border-[#69BFE3] hover:bg-[#69BFE3] hover:text-[#183B48]"
-                          }`}
-                        >
-                          {days} {days === 1 ? "day" : "days"}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* MOBILE RESULT */}
-
-                {rentalDays > 0 && (
-                  <div className="mt-8 rounded-[22px] bg-[#DCE4C8] p-5 lg:hidden">
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#183B48]/50">
-                      Your selection
-                    </p>
-
-                    <div className="mt-3 flex items-end justify-between gap-5">
-                      <div>
-                        <p className="text-[22px] font-semibold tracking-[-0.04em]">
-                          {rentalDays}{" "}
-                          {rentalDays === 1 ? "day" : "days"}
-                        </p>
-
-                        <p className="mt-1 text-[11px] text-[#183B48]/55">
-                          {formatDate(startDate)} → {formatDate(endDate)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              {/* RIGHT SUMMARY */}
 
-              <aside className="relative flex min-h-[420px] flex-col justify-between overflow-hidden bg-[#183B48] p-7 text-[#F7F5EF] sm:p-8 lg:p-10">
-                <div className="absolute -right-20 -top-20 h-[230px] w-[230px] rounded-full border border-white/10" />
-                <div className="absolute -right-10 -top-10 h-[140px] w-[140px] rounded-full border border-white/10" />
+              {/* ================================================= */}
+              {/* WEEK DAYS */}
+              {/* ================================================= */}
 
-                <div className="relative z-10">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#69BFE3]">
-                    Your rental
+              <div className="mt-10 grid grid-cols-7 gap-1.5 sm:gap-2.5">
+
+                {WEEK_DAYS.map((day) => (
+                  <div
+                    key={day}
+                    className="
+                      py-2
+                      text-center
+                      text-[7px]
+                      font-black
+                      tracking-[0.08em]
+                      text-[#49372D]/55
+                      sm:text-[9px]
+                      sm:tracking-[0.15em]
+                    "
+                  >
+                    {day}
+                  </div>
+                ))}
+
+              </div>
+
+
+              {/* ================================================= */}
+              {/* DAYS */}
+              {/* ================================================= */}
+
+              <div className="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2.5">
+
+                {calendarDays.map((date, index) => {
+                  if (!date) {
+                    return (
+                      <div
+                        key={`empty-${index}`}
+                        className="aspect-square"
+                      />
+                    );
+                  }
+
+                  const dateKey = toDateKey(date);
+
+                  const unavailable =
+                    unavailableSet.has(dateKey);
+
+                  const selectedStart =
+                    isSameDate(date, startDate);
+
+                  const selectedEnd =
+                    isSameDate(date, endDate);
+
+                  const selected =
+                    selectedStart || selectedEnd;
+
+                  const inRange =
+                    isBetween(date, startDate, endDate);
+
+                  return (
+                    <button
+                      key={dateKey}
+                      type="button"
+                      disabled={unavailable}
+                      onClick={() => handleDateClick(date)}
+                      aria-label={`${formatDate(date)}${
+                        unavailable
+                          ? " unavailable"
+                          : selected
+                            ? " selected"
+                            : " available"
+                      }`}
+                      className={`
+                        relative
+                        flex
+                        aspect-square
+                        min-w-0
+                        items-center
+                        justify-center
+                        rounded-[10px]
+                        text-[11px]
+                        font-bold
+                        transition-all
+                        duration-200
+                        sm:rounded-[15px]
+                        sm:text-[14px]
+                        md:rounded-[18px]
+                        md:text-[16px]
+
+                        ${
+                          unavailable
+                            ? `
+                              cursor-not-allowed
+                              bg-[#E5E3DF]
+                              text-[#49372D]/25
+                            `
+                            : selected
+                              ? `
+                                z-10
+                                bg-[#49372D]
+                                text-[#FFFDF8]
+                                shadow-[0_8px_20px_rgba(73,55,45,0.20)]
+                              `
+                              : inRange
+                                ? `
+                                  bg-[#DCE4C8]
+                                  text-[#49372D]
+                                `
+                                : `
+                                  bg-[#F3EFE7]
+                                  text-[#49372D]
+                                  hover:-translate-y-1
+                                  hover:bg-[#EAD9BC]
+                                `
+                        }
+                      `}
+                    >
+                      {date.getDate()}
+
+                      {/* START / END DOT */}
+                      {selected && (
+                        <span
+                          className="
+                            absolute
+                            bottom-[6px]
+                            h-1
+                            w-1
+                            rounded-full
+                            bg-[#B9DCEF]
+                          "
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+
+              </div>
+
+
+              {/* ================================================= */}
+              {/* LEGEND */}
+              {/* ================================================= */}
+
+              <div
+                className="
+                  mt-9
+                  flex
+                  flex-wrap
+                  items-center
+                  gap-x-6
+                  gap-y-3
+                  border-t
+                  border-[#49372D]/10
+                  pt-6
+                "
+              >
+
+                {/* AVAILABLE */}
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-[3px] bg-[#F3EFE7]" />
+
+                  <span className="text-[10px] font-semibold text-[#49372D]/55">
+                    Available
+                  </span>
+                </div>
+
+
+                {/* SELECTED */}
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-[3px] bg-[#49372D]" />
+
+                  <span className="text-[10px] font-semibold text-[#49372D]/55">
+                    Selected
+                  </span>
+                </div>
+
+
+                {/* RANGE */}
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-[3px] bg-[#DCE4C8]" />
+
+                  <span className="text-[10px] font-semibold text-[#49372D]/55">
+                    Your range
+                  </span>
+                </div>
+
+
+                {/* UNAVAILABLE */}
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-[3px] bg-[#E5E3DF]" />
+
+                  <span className="text-[10px] font-semibold text-[#49372D]/55">
+                    Unavailable
+                  </span>
+                </div>
+
+              </div>
+
+
+              {/* ================================================= */}
+              {/* YOUR DATES */}
+              {/* ================================================= */}
+
+              <div
+                className="
+                  mt-8
+                  rounded-[24px]
+                  border
+                  border-[#49372D]/10
+                  bg-[#F3EFE7]
+                  p-5
+                  sm:p-7
+                "
+              >
+
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#49372D]">
+                  Your dates
+                </p>
+
+
+                {/* NO DATE */}
+                {!startDate && (
+                  <p className="mt-4 text-[16px] font-medium leading-7 text-[#6F7F73] sm:text-[18px]">
+                    Select a start date on the calendar.
                   </p>
+                )}
 
-                  {rentalDays > 0 ? (
-                    <>
-                      <p className="mt-6 text-[62px] font-semibold leading-none tracking-[-0.06em] md:text-[74px]">
-                        {String(rentalDays).padStart(2, "0")}
-                      </p>
 
-                      <p className="mt-2 text-[13px] font-medium uppercase tracking-[0.12em] text-white/55">
-                        {rentalDays === 1 ? "Day selected" : "Days selected"}
-                      </p>
+                {/* START ONLY */}
+                {startDate && !endDate && (
+                  <div className="mt-5">
 
-                      <div className="mt-8 border-t border-white/10 pt-6">
-                        <p className="text-[11px] leading-6 text-white/55">
-                          {formatDate(startDate)}
+                    <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6F7F73]">
+                      Start
+                    </p>
+
+                    <p className="mt-2 text-[22px] font-black tracking-[-0.035em] text-[#49372D]">
+                      {formatDate(startDate)}
+                    </p>
+
+                    <p className="mt-4 text-[13px] font-medium text-[#6F7F73]">
+                      Now choose your end date.
+                    </p>
+
+                  </div>
+                )}
+
+
+                {/* COMPLETE RANGE */}
+                {startDate && endDate && (
+                  <div className="mt-5">
+
+                    <div className="grid gap-5 sm:grid-cols-[1fr_auto_1fr_auto] sm:items-center">
+
+                      {/* START */}
+                      <div>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#6F7F73]">
+                          Start
                         </p>
 
-                        <div className="my-2 h-8 w-px bg-[#69BFE3]/50" />
+                        <p className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[#49372D] sm:text-[21px]">
+                          {formatDate(startDate)}
+                        </p>
+                      </div>
 
-                        <p className="text-[11px] leading-6 text-white/55">
+
+                      <span className="hidden text-[#49372D]/30 sm:block">
+                        →
+                      </span>
+
+
+                      {/* END */}
+                      <div>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#6F7F73]">
+                          End
+                        </p>
+
+                        <p className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[#49372D] sm:text-[21px]">
                           {formatDate(endDate)}
                         </p>
                       </div>
-                    </>
-                  ) : (
-                    <div className="mt-8">
-                      <p className="max-w-[240px] text-[30px] font-semibold leading-[1.05] tracking-[-0.045em]">
-                        Pick your start and end dates.
-                      </p>
 
-                      <p className="mt-5 max-w-[250px] text-[12px] leading-6 text-white/50">
-                        The number of rental days will be calculated
-                        automatically.
-                      </p>
+
+                      {/* DAYS */}
+                      <div
+                        className="
+                          flex
+                          min-h-[76px]
+                          items-center
+                          justify-center
+                          rounded-[18px]
+                          bg-[#DCE4C8]
+                          px-6
+                          text-center
+                        "
+                      >
+                        <div>
+                          <p className="text-[27px] font-black leading-none text-[#49372D]">
+                            {rentalDays}
+                          </p>
+
+                          <p className="mt-1 text-[8px] font-bold uppercase tracking-[0.13em] text-[#6F7F73]">
+                            {rentalDays === 1 ? "Day" : "Days"}
+                          </p>
+                        </div>
+                      </div>
+
                     </div>
-                  )}
-                </div>
 
-                <div className="relative z-10 mt-10">
-                  <button
-                    type="button"
-                    disabled={!startDate || !endDate}
-                    onClick={handleCheckAvailability}
-                    className="flex w-full items-center justify-between rounded-full bg-[#69BFE3] px-6 py-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#183B48] transition-all duration-300 hover:-translate-y-1 hover:bg-white disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:translate-y-0"
+                  </div>
+                )}
+
+
+                {/* STATUS MESSAGE */}
+                {startDate && (
+                  <div className="mt-6 border-t border-[#49372D]/10 pt-5">
+
+                    <div className="flex items-start gap-3">
+
+                      <span
+                        className={`
+                          mt-[6px]
+                          h-2
+                          w-2
+                          shrink-0
+                          rounded-full
+                          ${
+                            startDate && endDate
+                              ? "bg-[#6F7F73]"
+                              : "bg-[#EAD9BC]"
+                          }
+                        `}
+                      />
+
+                      <p className="text-[11px] font-medium leading-5 text-[#6F7F73]">
+                        {message}
+                      </p>
+
+                    </div>
+
+                  </div>
+                )}
+
+              </div>
+
+
+              {/* ================================================= */}
+              {/* CONTINUE */}
+              {/* ================================================= */}
+
+              {startDate && endDate && rentalDays > 0 && (
+                <div className="mt-7">
+
+                  <Link
+                    href={`/reservation?start=${toDateKey(
+                      startDate
+                    )}&end=${toDateKey(
+                      endDate
+                    )}&days=${rentalDays}`}
+                    className="
+                      flex
+                      w-full
+                      items-center
+                      justify-between
+                      rounded-full
+                      bg-[#49372D]
+                      px-7
+                      py-5
+                      text-[10px]
+                      font-bold
+                      uppercase
+                      tracking-[0.13em]
+                      text-[#F5F1E8]
+                      transition-all
+                      duration-300
+                      hover:-translate-y-1
+                      hover:bg-[#6F7F73]
+                    "
                   >
-                    <span>Check availability</span>
+                    <span>Continue to booking</span>
 
-                    <span>↗</span>
-                  </button>
+                    <span className="text-base">
+                      ↗
+                    </span>
+                  </Link>
+
                 </div>
-              </aside>
+              )}
+
             </div>
           </div>
 
+
           {/* ================================================= */}
-          {/* RESULT */}
+          {/* SMALL NOTE */}
           {/* ================================================= */}
 
-          {checked && startDate && endDate && (
-            <div className="mt-8 rounded-[30px] border border-[#183B48]/10 bg-[#DCE4C8] p-6 sm:p-8 md:p-10">
-              <div className="flex flex-col justify-between gap-8 md:flex-row md:items-center">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#6F7F73]" />
+          <p className="mx-auto mt-6 max-w-xl text-center text-[10px] font-medium leading-5 text-[#6F7F73]/70">
+            Availability shown here is currently for demonstration.
+            Live availability will be connected to the booking system.
+          </p>
 
-                    <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#6F7F73]">
-                      Rental period selected
-                    </p>
-                  </div>
-
-                  <h3 className="mt-4 text-[32px] font-semibold tracking-[-0.045em] text-[#183B48] md:text-[42px]">
-                    {rentalDays} {rentalDays === 1 ? "day" : "days"}
-                  </h3>
-
-                  <p className="mt-2 text-sm font-medium text-[#183B48]/55">
-                    {formatDate(startDate)} → {formatDate(endDate)}
-                  </p>
-                </div>
-
-                <Link
-                  href={`/reservation?start=${toInputDate(
-                    startDate,
-                  )}&end=${toInputDate(endDate)}&days=${rentalDays}`}
-                  className="inline-flex items-center justify-center gap-3 rounded-full bg-[#183B48] px-7 py-4 text-[10px] font-bold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#69BFE3] hover:text-[#183B48]"
-                >
-                  Continue to booking
-                  <span>↗</span>
-                </Link>
-              </div>
-            </div>
-          )}
         </div>
       </section>
+
     </main>
   );
 }
