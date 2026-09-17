@@ -40,8 +40,15 @@ export default function Header() {
         <Link
           href="/"
           onClick={closeMenu}
-          className="header-brand relative z-50"
+          className="header-brand relative z-50 flex items-center gap-2"
         >
+          <img
+            src="/images/logo.png"
+            alt=""
+            aria-hidden="true"
+            className="h-12 w-12 object-contain md:h-16 md:w-16"
+          />
+
           ECO KEPHYRA
         </Link>
 

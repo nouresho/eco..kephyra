@@ -125,10 +125,6 @@ export default function Home() {
             </svg>
           </div>
 
-          <div className="hero-logo-desktop">
-            <img src="/images/logo.png" alt="ECO KEPHYRA" />
-          </div>
-
           <div className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] max-w-7xl items-center gap-10 px-10 pb-14 pt-[120px] lg:gap-16 lg:px-12">
             <div className="flex flex-1 items-center">
               <div>
@@ -137,12 +133,15 @@ export default function Home() {
                     ELECTRIC
                   </span>
 
-                  <span className="hero-title-line hero-title-line--two relative block">
+                  <span className="hero-title-line hero-title-line--two block">
                     SCOOTERS
-                    <span className="hero-script-word">for</span>
                   </span>
 
                   <span className="hero-title-line hero-title-line--three block">
+                    FOR
+                  </span>
+
+                  <span className="hero-title-line hero-title-line--four block">
                     RENTAL
                   </span>
                 </h1>
@@ -189,10 +188,6 @@ export default function Home() {
 
           <div className="absolute inset-0 z-[1] bg-[#49372D]/25" />
 
-          <div className="hero-logo-mobile">
-            <img src="/images/logo.png" alt="ECO KEPHYRA" />
-          </div>
-
           <div className="relative z-10 flex min-h-[calc(100svh-90px)] items-center justify-center px-4 pb-16 pt-[125px] text-center">
             <div className="w-full">
               <h1 className="hero-mobile-title">
@@ -200,12 +195,15 @@ export default function Home() {
                   ELECTRIC
                 </span>
 
-                <span className="hero-title-line hero-title-line--two relative block">
+                <span className="hero-title-line hero-title-line--two block">
                   SCOOTERS
-                  <span className="hero-mobile-script">for</span>
                 </span>
 
                 <span className="hero-title-line hero-title-line--three block">
+                  FOR
+                </span>
+
+                <span className="hero-title-line hero-title-line--four block">
                   RENTAL
                 </span>
               </h1>
@@ -235,12 +233,8 @@ export default function Home() {
       <section className="bg-[#F5F1E8] px-5 py-24 md:px-10 md:py-32 lg:px-14">
         <div className="mx-auto max-w-6xl">
           <div className="mb-14 text-center md:mb-20">
-            <p className="vintage-label text-[#6F7F73]">
-              Before you ride
-            </p>
-
             <h2 className="vintage-title retro-shadow mt-5 text-[58px] text-[#49372D] sm:text-[72px] md:text-[96px]">
-              QUESTIONS?
+              FAQs
             </h2>
 
             <p className="mx-auto mt-5 max-w-lg text-sm font-medium leading-7 text-[#6F7F73]">
@@ -659,5 +653,5 @@ export default function Home() {
         </div>
       </section>
     </>
-  );
+  );``
 }
