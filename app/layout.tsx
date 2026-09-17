@@ -38,6 +38,20 @@ export default function RootLayout({
         <main>{children}</main>
 
         <Footer />
+
+        <a
+          href="https://wa.me/212623201547"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="WhatsApp us"
+          className="floating-whatsapp"
+        >
+          <img
+            src="/images/whatsapp.png"
+            alt="WhatsApp"
+            className="floating-whatsapp-image"
+          />
+        </a>
       </body>
     </html>
   );
