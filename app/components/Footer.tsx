@@ -19,7 +19,7 @@ export default function Footer() {
         <div className="mt-7 flex items-center gap-8">
 
           <a
-            href="#"
+            href="https://www.instagram.com/eco.kephyra?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw=="
             target="_blank"
             rel="noopener noreferrer"
             className="footer-social-link"
@@ -30,7 +30,7 @@ export default function Footer() {
           <span className="h-[3px] w-[3px] rounded-full bg-[#DCE4C8]" />
 
           <a
-            href="#"
+            href="https://www.tiktok.com/@eco_kephyra?_r=1&_t=ZS-99oQfjZ14Tq"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-social-link"

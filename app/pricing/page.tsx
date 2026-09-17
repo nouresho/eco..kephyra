@@ -94,32 +94,22 @@ export default function PricingPage() {
         />
 
         {/* HERO CONTENT */}
-        <div className="relative z-10 mx-auto max-w-7xl">
-
-          <div className="mt-9 text-center">
-
-            <h1 className="pricing-main-title mt-5">
-              RIDE
-              <br />
-              <span>YOUR WAY.</span>
-            </h1>
-
-            <p className="pricing-script-word">
-              Pricing
-            </p>
-
-          </div>
-
-          <div className="mx-auto mt-10 max-w-2xl text-center">
-
-            <p className="text-sm font-medium leading-7 text-[#49372D] md:text-base">
-              Transparent pricing for your electric adventure.
-              Choose your rental period and enjoy the road with everything
-              you need to ride.
-            </p>
-
-          </div>
-
+        <div
+          className="
+            relative
+            z-10
+            mx-auto
+            flex
+            min-h-[350px]
+            max-w-7xl
+            items-center
+            justify-center
+            md:min-h-[450px]
+          "
+        >
+          <p className="pricing-script-word pricing-script-word-large">
+            Pricing
+          </p>
         </div>
 
         <WavyDivider color="#F5F1E8" />
@@ -127,7 +117,7 @@ export default function PricingPage() {
 
 
       {/* ================================================= */}
-      {/* RENTAL RATES */}
+      {/* PRICING OFFERS */}
       {/* ================================================= */}
 
       <section
@@ -137,112 +127,83 @@ export default function PricingPage() {
           bg-[#F5F1E8]
           px-6
           pb-36
-          pt-28
+          pt-24
           md:px-12
           md:pb-44
-          md:pt-36
+          md:pt-32
         "
       >
         <div className="mx-auto max-w-7xl">
 
-          {/* SECTION INTRO */}
-          <div className="grid items-end gap-8 md:grid-cols-2">
+          <div className="pricing-cards-grid pricing-cards-uniform">
+            {prices.map((item, index) => {
+              const whatsappMessage = encodeURIComponent(
+                `Hello ECO KEPHYRA, I would like to book the ${item.period} rental offer at ${item.price} ${item.unit}.`
+              );
 
-            {/* LEFT */}
-            <div>
+              const reservationUrl = `/reservation?period=${encodeURIComponent(
+                item.period
+              )}&price=${encodeURIComponent(item.price)}`;
 
-              <p className="vintage-label text-[#6F7F73]">
-                Choose your ride
-              </p>
-
-              <h2
-                className="
-                  vintage-title
-                  retro-shadow
-                  mt-5
-                  text-[58px]
-                  text-[#49372D]
-                  md:text-[92px]
-                "
-              >
-                RENTAL
-                <br />
-                RATES
-              </h2>
-
-            </div>
-
-
-            {/* RIGHT */}
-            <div className="md:pb-3">
-
-              <p
-                className="
-                  max-w-md
-                  border-l-2
-                  border-[#49372D]
-                  pl-5
-                  text-sm
-                  font-medium
-                  leading-7
-                  text-[#66705C]
-                "
-              >
-                One scooter. One simple rate.
-                More freedom to explore at your own pace.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          {/* ================================================= */}
-          {/* ORGANIC RETRO PRICING CARDS — STYLE 10 */}
-          {/* ================================================= */}
-
-          <div className="pricing-cards-grid mt-14">
-
-            {prices.map((item, index) => (
-              <article
-                key={item.period}
-                className={`pricing-shape-card pricing-shape-card-${index + 1}`}
-              >
-
-                {/* NUMBER */}
-                <span className="pricing-shape-number">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-
-
-                {/* PERIOD */}
-                <h3 className="pricing-shape-period">
-                  {item.period}
-                </h3>
-
-
-                {/* PRICE */}
-                <div className="pricing-shape-price">
-
-                  <span>
-                    {item.price}
+              return (
+                <article
+                  key={item.period}
+                  className="pricing-shape-card pricing-shape-card-uniform"
+                >
+                  {/* NUMBER */}
+                  <span className="pricing-shape-number">
+                    {String(index + 1).padStart(2, "0")}
                   </span>
 
-                  <small>
-                    {item.unit}
-                  </small>
+                  {/* PERIOD */}
+                  <h3 className="pricing-shape-period">
+                    {item.period}
+                  </h3>
 
-                </div>
+                  {/* PRICE */}
+                  <div className="pricing-shape-price">
+                    <span>{item.price}</span>
+
+                    <small>{item.unit}</small>
+                  </div>
+
+                  {/* DESCRIPTION */}
+                  <p className="pricing-shape-note">
+                    {item.note}
+                  </p>
 
 
-                {/* DESCRIPTION */}
-                <p className="pricing-shape-note">
-                  {item.note}
-                </p>
+                  {/* ===================================== */}
+                  {/* BOOKING OPTIONS */}
+                  {/* ===================================== */}
 
-              </article>
-            ))}
+                  <div className="pricing-card-actions">
 
+                    {/* WHATSAPP */}
+                    <a
+                      href={`https://wa.me/212623201547?text=${whatsappMessage}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="pricing-card-whatsapp"
+                    >
+                      <span>Book on WhatsApp</span>
+                      <span>↗</span>
+                    </a>
+
+
+                    {/* ONLINE PAYMENT */}
+                    <Link
+                      href={reservationUrl}
+                      className="pricing-card-online"
+                    >
+                      <span>Book &amp; Pay Online</span>
+                      <span>→</span>
+                    </Link>
+
+                  </div>
+                </article>
+              );
+            })}
           </div>
 
         </div>
@@ -251,68 +212,77 @@ export default function PricingPage() {
       </section>
 
 
-
-
       {/* ================================================= */}
-{/* FINAL CTA */}
-{/* ================================================= */}
+      {/* FINAL CTA */}
+      {/* ================================================= */}
 
-<section className="ready-ride-section relative overflow-hidden px-6 pb-28 pt-36 text-center md:px-12 md:pb-36 md:pt-44">
+      <section
+        className="
+          ready-ride-section
+          relative
+          overflow-hidden
+          px-6
+          pb-28
+          pt-36
+          text-center
+          md:px-12
+          md:pb-36
+          md:pt-44
+        "
+      >
+        {/* BACKGROUND IMAGE */}
+        <div className="ready-ride-bg" />
 
-  {/* BACKGROUND IMAGE */}
-  <div className="ready-ride-bg" />
+        {/* DARK / VINTAGE OVERLAY */}
+        <div className="ready-ride-overlay" />
 
-  {/* DARK / VINTAGE OVERLAY */}
-  <div className="ready-ride-overlay" />
+        {/* CONTENT */}
+        <div className="relative z-10 mx-auto max-w-5xl">
 
-  {/* CONTENT */}
-  <div className="relative z-10 mx-auto max-w-5xl">
+          <p className="vintage-label text-[#DCE4C8]">
+            Pick a day. Take the road.
+          </p>
 
-    <p className="vintage-label text-[#DCE4C8]">
-      Pick a day. Take the road.
-    </p>
+          <h2
+            className="
+              vintage-title
+              retro-shadow
+              mt-6
+              text-[64px]
+              text-[#FFF8EC]
+              md:text-[105px]
+            "
+          >
+            READY
+            <br />
+            TO RIDE?
+          </h2>
 
-    <h2
-      className="
-        vintage-title
-        retro-shadow
-        mt-6
-        text-[64px]
-        text-[#FFF8EC]
-        md:text-[105px]
-      "
-    >
-      READY
-      <br />
-      TO RIDE?
-    </h2>
+          <p
+            className="
+              mx-auto
+              mt-7
+              max-w-lg
+              text-sm
+              font-medium
+              leading-7
+              text-[#F5F1E8]
+              md:text-base
+            "
+          >
+            Choose your day, book your scooter and start your
+            ECO KEPHYRA adventure.
+          </p>
 
-    <p
-      className="
-        mx-auto
-        mt-7
-        max-w-lg
-        text-sm
-        font-medium
-        leading-7
-        text-[#F5F1E8]
-        md:text-base
-      "
-    >
-      Choose your day, book your scooter and start your
-      ECO KEPHYRA adventure.
-    </p>
+          <Link
+            href="/reservation"
+            className="ready-ride-button"
+          >
+            BOOK
+          </Link>
 
-    <Link
-      href="/reservation"
-      className="ready-ride-button"
-    >
-      BOOK
-    </Link>
-
-  </div>
-
-</section>
+        </div>
+      </section>
 
     </main>
   );
