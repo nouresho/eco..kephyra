@@ -3,6 +3,10 @@ import WhyUs from "./components/WhyUs";
 import WavyDivider from "./components/WavyDivider";
 
 
+/* ================================================= */
+/* FAQs */
+/* ================================================= */
+
 const homeFaqs = [
   {
     number: "01",
@@ -48,7 +52,8 @@ const homeFaqs = [
   },
   {
     number: "08",
-    question: "Can the scooter handle the hills around Tamraght and Taghazout?",
+    question:
+      "Can the scooter handle the hills around Tamraght and Taghazout?",
     answer:
       "Yes. The scooter can handle the hills and slopes around Tamraght and Taghazout. It has Eco and Sport modes, and even Eco mode can carry two people weighing 80 kg or more each.",
   },
@@ -72,27 +77,37 @@ const homeFaqs = [
   },
 ];
 
-/*
-  TEMPORARY PLACEHOLDER REVIEWS
-  Replace these with real customer reviews later.
-*/
+
+/* ================================================= */
+/* TEMPORARY REVIEWS */
+/* Replace with real reviews later */
+/* ================================================= */
+
 const reviews = [
   {
     name: "Sarah M.",
     rating: 5,
-    text: "Super easy to book and the scooter was perfect for exploring the coast.",
+    text:
+      "Super easy to book and the scooter was perfect for exploring the coast.",
   },
   {
     name: "Adam R.",
     rating: 5,
-    text: "We rode from Tamraght to Taghazout. Smooth, quiet and such a fun experience.",
+    text:
+      "We rode from Tamraght to Taghazout. Smooth, quiet and such a fun experience.",
   },
   {
     name: "Lina K.",
     rating: 5,
-    text: "The team explained everything before the ride and made the whole experience really easy.",
+    text:
+      "The team explained everything before the ride and made the whole experience really easy.",
   },
 ];
+
+
+/* ================================================= */
+/* HOME */
+/* ================================================= */
 
 export default function Home() {
   return (
@@ -101,122 +116,140 @@ export default function Home() {
       {/* HERO */}
       {/* ================================================= */}
 
-      <section className="hero-home relative overflow-hidden bg-[#F3EFE7]">
-        {/* DESKTOP HERO */}
-        <div className="relative hidden min-h-[calc(100vh-100px)] md:block">
-          <div className="pointer-events-none absolute inset-0 z-0">
-            <svg
-              viewBox="0 0 1440 900"
-              preserveAspectRatio="none"
-              className="h-full w-full"
-            >
-              <path
-                d="
-                  M0,610
-                  C170,470 320,690 500,555
-                  C700,405 860,645 1050,505
-                  C1220,380 1345,480 1440,410
-                  L1440,900
-                  L0,900
-                  Z
-                "
-                fill="#B9DCEF"
-              />
-            </svg>
-          </div>
+<section className="hero-home relative overflow-hidden">
 
-          <div className="relative z-10 mx-auto flex min-h-[calc(100vh-100px)] max-w-7xl items-center gap-10 px-10 pb-14 pt-[120px] lg:gap-16 lg:px-12">
-            <div className="flex flex-1 items-center">
-              <div>
-                <h1 className="hero-main-title">
-                  <span className="hero-title-line hero-title-line--one block">
-                    ELECTRIC
-                  </span>
+  {/* DESKTOP HERO */}
+  <div className="relative hidden min-h-[calc(100vh-88px)] overflow-hidden bg-[#DCE4C8] md:block">
 
-                  <span className="hero-title-line hero-title-line--two block">
-                    SCOOTERS
-                  </span>
+    {/* TITLE LEFT */}
+    <div
+      className="
+        absolute
+        left-10
+        top-1/2
+        z-20
+        w-[38%]
+        -translate-y-1/2
+        lg:left-14
+      "
+    >
+      <h1 className="hero-main-title">
+        <span className="hero-title-line hero-title-line--one block">
+          ELECTRIC
+        </span>
 
-                  <span className="hero-title-line hero-title-line--three block">
-                    FOR
-                  </span>
+        <span className="hero-title-line hero-title-line--two block">
+          SCOOTERS
+        </span>
 
-                  <span className="hero-title-line hero-title-line--four block">
-                    RENTAL
-                  </span>
-                </h1>
+        <span className="hero-title-line hero-title-line--three block">
+          FOR
+        </span>
 
-                <p className="hero-home-caption hero-caption-typing hero-tagline-script">
-                  No fuel. No smoke. No pollution.
-                </p>
-              </div>
-            </div>
+        <span className="hero-title-line hero-title-line--four block">
+          RENTAL
+        </span>
+      </h1>
 
-            <div className="flex shrink-0 justify-center">
-              <div className="phone-wrapper">
-                <div className="phone-frame">
-                  <div className="phone-speaker" />
+      <p className="hero-home-caption hero-caption-typing hero-tagline-script">
+        No fuel. No smoke. No pollution.
+      </p>
+    </div>
 
-                  <video
-                    className="phone-video"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    poster="/images/hero-poster.jpg"
-                  >
-                    <source src="/videos/intro.mp4" type="video/mp4" />
-                  </video>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* MOBILE HERO */}
-        <div className="relative min-h-[calc(100svh-90px)] md:hidden">
-          <video
-            className="absolute inset-0 h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/images/hero-poster.jpg"
-          >
-            <source src="/videos/intro.mp4" type="video/mp4" />
-          </video>
+    {/* ================================================= */}
+{/* VIDEO — CENTER + FULL HERO HEIGHT */}
+{/* ================================================= */}
 
-          <div className="absolute inset-0 z-[1] bg-[#49372D]/25" />
+<div
+  className="
+    absolute
+    left-1/2
+    top-0
+    z-10
+    h-full
+    -translate-x-1/2
+  "
+>
+  <video
+    className="
+      block
+      h-full
+      w-auto
+      max-w-none
+      object-contain
+    "
+    autoPlay
+    muted
+    loop
+    playsInline
+    poster="/images/hero-poster.jpg"
+  >
+    <source
+      src="/videos/intro.mp4"
+      type="video/mp4"
+    />
+  </video>
+</div>
+    
 
-          <div className="relative z-10 flex min-h-[calc(100svh-90px)] items-center justify-center px-4 pb-16 pt-[125px] text-center">
-            <div className="w-full">
-              <h1 className="hero-mobile-title">
-                <span className="hero-title-line hero-title-line--one block">
-                  ELECTRIC
-                </span>
+    <WavyDivider color="#F5F1E8" />
+  </div>
 
-                <span className="hero-title-line hero-title-line--two block">
-                  SCOOTERS
-                </span>
 
-                <span className="hero-title-line hero-title-line--three block">
-                  FOR
-                </span>
+  {/* MOBILE HERO */}
+  <div className="relative min-h-[calc(100svh-90px)] md:hidden">
 
-                <span className="hero-title-line hero-title-line--four block">
-                  RENTAL
-                </span>
-              </h1>
+    <video
+      className="absolute inset-0 h-full w-full object-cover"
+      autoPlay
+      muted
+      loop
+      playsInline
+      poster="/images/hero-poster.jpg"
+    >
+      <source
+        src="/videos/intro.mp4"
+        type="video/mp4"
+      />
+    </video>
 
-              <p className="hero-mobile-caption hero-caption-typing hero-tagline-script">
-                No fuel. No smoke. No pollution.
-              </p>
-            </div>
-          </div>
-        </div>
+    <div className="absolute inset-0 z-[1] bg-[#49372D]/25" />
 
-        <WavyDivider color="#F5F1E8" />
-      </section>
+    <div className="relative z-10 flex min-h-[calc(100svh-90px)] items-center justify-center px-4 pb-16 pt-[125px] text-center">
+      <div className="w-full">
+
+        <h1 className="hero-mobile-title">
+          <span className="hero-title-line hero-title-line--one block">
+            ELECTRIC
+          </span>
+
+          <span className="hero-title-line hero-title-line--two block">
+            SCOOTERS
+          </span>
+
+          <span className="hero-title-line hero-title-line--three block">
+            FOR
+          </span>
+
+          <span className="hero-title-line hero-title-line--four block">
+            RENTAL
+          </span>
+        </h1>
+
+        <p className="hero-mobile-caption hero-caption-typing hero-tagline-script">
+          No fuel. No smoke. No pollution.
+        </p>
+
+      </div>
+    </div>
+
+    <WavyDivider color="#F5F1E8" />
+  </div>
+
+</section>
+
+
 
       {/* ================================================= */}
       {/* WHY CHOOSE US */}
@@ -226,14 +259,19 @@ export default function Home() {
         <WhyUs />
       </div>
 
+
       {/* ================================================= */}
-      {/* FAQs DIRECTLY ON HOME */}
+      {/* FAQs */}
       {/* ================================================= */}
 
       <section className="bg-[#F5F1E8] px-5 py-24 md:px-10 md:py-32 lg:px-14">
+
         <div className="mx-auto max-w-6xl">
+
+          {/* CENTERED TITLE */}
           <div className="mb-14 text-center md:mb-20">
-            <h2 className="vintage-title retro-shadow mt-5 text-[58px] text-[#49372D] sm:text-[72px] md:text-[96px]">
+
+            <h2 className="section-title mt-5">
               FAQs
             </h2>
 
@@ -241,15 +279,21 @@ export default function Home() {
               Everything you need to know before starting your electric
               adventure.
             </p>
+
           </div>
 
+
+          {/* FAQ LIST */}
           <div className="border-t border-[#49372D]/20">
+
             {homeFaqs.map((faq) => (
               <details
                 key={faq.number}
                 className="group border-b border-[#49372D]/20"
               >
+
                 <summary className="flex cursor-pointer list-none items-center gap-5 py-7 md:gap-8 md:py-9">
+
                   <span className="w-8 shrink-0 text-[10px] font-bold tracking-[0.16em] text-[#6F7F73]">
                     {faq.number}
                   </span>
@@ -261,234 +305,261 @@ export default function Home() {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#49372D]/25 text-xl font-light text-[#49372D] transition-transform duration-300 group-open:rotate-45">
                     +
                   </span>
+
                 </summary>
 
+
                 <div className="pb-8 pl-[52px] pr-12 md:pb-10 md:pl-[64px]">
+
                   <p className="max-w-3xl text-sm font-medium leading-7 text-[#6F7F73] md:text-base">
                     {faq.answer}
                   </p>
+
                 </div>
+
               </details>
             ))}
+
           </div>
+
         </div>
+
       </section>
-      {/* ================================================= */}
-{/* HOW TO BOOK */}
-{/* ================================================= */}
-
-<section className="bg-[#B9DCEF] px-5 py-24 md:px-10 md:py-32 lg:px-14">
-  <div className="mx-auto max-w-7xl">
-
-    {/* TITLE */}
-    <div className="mb-14 md:mb-20">
-      <p className="vintage-label text-[#526B61]">
-        Two easy ways
-      </p>
-
-      <h2 className="vintage-title retro-shadow mt-5 text-[60px] text-[#49372D] sm:text-[78px] md:text-[105px]">
-        HOW TO
-        <br />
-        BOOK.
-      </h2>
-    </div>
-
-
-    {/* CARDS */}
-    <div className="grid gap-5 lg:grid-cols-2">
-
-      {/* ================================================= */}
-      {/* 01 — ONLINE BOOKING */}
-      {/* ================================================= */}
-
-      <article className="flex min-h-[620px] flex-col rounded-[30px] bg-[#F5F1E8] p-7 md:p-10">
-
-        {/* NUMBER */}
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#49372D]/30">
-          <span className="text-[11px] font-bold tracking-[0.16em] text-[#49372D]">
-            01
-          </span>
-        </div>
-
-
-        {/* LABEL */}
-        <p className="mt-10 text-[10px] font-bold uppercase tracking-[0.22em] text-[#6F7F73]">
-          Online Booking
-        </p>
-
-
-        {/* TITLE */}
-        <h3 className="mt-7 max-w-lg text-[36px] font-black leading-[1.02] tracking-[-0.045em] text-[#49372D] md:text-[48px]">
-          Book and pay securely online
-        </h3>
-
-
-        {/* DESCRIPTION */}
-        <p className="mt-7 max-w-xl text-sm font-medium leading-7 text-[#6F7F73] md:text-base">
-          Check the available dates, choose your rental period and number of
-          scooters, complete your details, then continue to Stripe Checkout.
-          Your payment is processed securely by Stripe.
-        </p>
-
-
-        {/* STEPS */}
-        <div className="mt-10 border-t border-[#49372D]/15">
-
-          <div className="flex gap-5 border-b border-[#49372D]/15 py-4">
-            <span className="text-[10px] font-bold tracking-[0.14em] text-[#6F7F73]">
-              01
-            </span>
-
-            <p className="text-[12px] font-bold tracking-[0.04em] text-[#49372D]">
-              Choose available dates
-            </p>
-          </div>
-
-
-          <div className="flex gap-5 border-b border-[#49372D]/15 py-4">
-            <span className="text-[10px] font-bold tracking-[0.14em] text-[#6F7F73]">
-              02
-            </span>
-
-            <p className="text-[12px] font-bold tracking-[0.04em] text-[#49372D]">
-              See the calculated price
-            </p>
-          </div>
-
-
-          <div className="flex gap-5 py-4">
-            <span className="text-[10px] font-bold tracking-[0.14em] text-[#6F7F73]">
-              03
-            </span>
-
-            <p className="text-[12px] font-bold tracking-[0.04em] text-[#49372D]">
-              Pay securely with Stripe
-            </p>
-          </div>
-
-        </div>
-
-
-        {/* BUTTON */}
-        <div className="mt-auto pt-9">
-          <Link
-            href="/date-availability"
-            className="inline-flex items-center justify-center gap-4 rounded-full bg-[#49372D] px-8 py-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#F5F1E8] transition-all duration-300 hover:-translate-y-1 hover:bg-[#6F7F73]"
-          >
-            Book online
-            <span>→</span>
-          </Link>
-        </div>
-
-      </article>
 
 
       {/* ================================================= */}
-      {/* 02 — CASH PAYMENT */}
+      {/* HOW TO BOOK */}
       {/* ================================================= */}
 
-      <article className="flex min-h-[620px] flex-col rounded-[30px] bg-[#49372D] p-7 text-[#F5F1E8] md:p-10">
+      <section className="bg-[#B9DCEF] px-5 py-24 md:px-10 md:py-32 lg:px-14">
 
-        {/* NUMBER */}
-        <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/25">
-          <span className="text-[11px] font-bold tracking-[0.16em] text-[#B9DCEF]">
-            02
-          </span>
-        </div>
+        <div className="mx-auto max-w-7xl">
 
+          {/* CENTERED TITLE */}
+          <div className="mb-14 text-center md:mb-20">
 
-        {/* LABEL */}
-        <p className="mt-10 text-[10px] font-bold uppercase tracking-[0.22em] text-[#B9DCEF]">
-          Cash Payment
-        </p>
-
-
-        {/* TITLE */}
-        <h3 className="mt-7 max-w-lg text-[36px] font-black leading-[1.02] tracking-[-0.045em] text-[#F5F1E8] md:text-[48px]">
-          Book with us and pay on collection
-        </h3>
-
-
-        {/* DESCRIPTION */}
-        <p className="mt-7 max-w-xl text-sm font-medium leading-7 text-[#EADAC8] md:text-base">
-          Contact us on WhatsApp to arrange your scooter. If you are in
-          Tamraght, we can discuss delivery; otherwise, visit our location,
-          collect your scooter and pay in cash.
-        </p>
-
-
-        {/* STEPS */}
-        <div className="mt-10 border-t border-white/15">
-
-          <div className="flex gap-5 border-b border-white/15 py-4">
-            <span className="text-[10px] font-bold tracking-[0.14em] text-[#B9DCEF]">
-              01
-            </span>
-
-            <p className="text-[12px] font-bold tracking-[0.04em] text-[#F5F1E8]">
-              Message us on WhatsApp
+            <p className="vintage-label text-[#526B61]">
+              Two easy ways
             </p>
+
+            <h2 className="section-title mt-5">
+              HOW TO BOOK
+
+            </h2>
+
           </div>
 
 
-          <div className="flex gap-5 border-b border-white/15 py-4">
-            <span className="text-[10px] font-bold tracking-[0.14em] text-[#B9DCEF]">
-              02
-            </span>
+          {/* CARDS */}
+          <div className="grid gap-5 lg:grid-cols-2">
 
-            <p className="text-[12px] font-bold tracking-[0.04em] text-[#F5F1E8]">
-              Find our exact location
-            </p>
-          </div>
+            {/* ================================================= */}
+            {/* ONLINE BOOKING */}
+            {/* ================================================= */}
+
+            <article className="flex min-h-[620px] flex-col rounded-[30px] bg-[#F5F1E8] p-7 md:p-10">
+
+              {/* NUMBER */}
+              <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#49372D]/30">
+
+                <span className="text-[11px] font-bold tracking-[0.16em] text-[#49372D]">
+                  01
+                </span>
+
+              </div>
 
 
-          <div className="flex gap-5 py-4">
-            <span className="text-[10px] font-bold tracking-[0.14em] text-[#B9DCEF]">
-              03
-            </span>
+              {/* LABEL */}
+              <p className="mt-10 text-[10px] font-bold uppercase tracking-[0.22em] text-[#6F7F73]">
+                Online Booking
+              </p>
 
-            <p className="text-[12px] font-bold tracking-[0.04em] text-[#F5F1E8]">
-              Pay in cash when collecting
-            </p>
+
+              {/* TITLE */}
+              <h3 className="mt-7 max-w-lg text-[36px] font-black leading-[1.02] tracking-[-0.045em] text-[#49372D] md:text-[48px]">
+                Book and pay securely online
+              </h3>
+
+
+              {/* DESCRIPTION */}
+              <p className="mt-7 max-w-xl text-sm font-medium leading-7 text-[#6F7F73] md:text-base">
+                Check the available dates, choose your rental period and number
+                of scooters, complete your details, then continue to Stripe
+                Checkout. Your payment is processed securely by Stripe.
+              </p>
+
+
+              {/* STEPS */}
+              <div className="mt-10 border-t border-[#49372D]/15">
+
+                <div className="flex gap-5 border-b border-[#49372D]/15 py-4">
+
+                  <span className="text-[10px] font-bold tracking-[0.14em] text-[#6F7F73]">
+                    01
+                  </span>
+
+                  <p className="text-[12px] font-bold tracking-[0.04em] text-[#49372D]">
+                    Choose available dates
+                  </p>
+
+                </div>
+
+
+                <div className="flex gap-5 border-b border-[#49372D]/15 py-4">
+
+                  <span className="text-[10px] font-bold tracking-[0.14em] text-[#6F7F73]">
+                    02
+                  </span>
+
+                  <p className="text-[12px] font-bold tracking-[0.04em] text-[#49372D]">
+                    See the calculated price
+                  </p>
+
+                </div>
+
+
+                <div className="flex gap-5 py-4">
+
+                  <span className="text-[10px] font-bold tracking-[0.14em] text-[#6F7F73]">
+                    03
+                  </span>
+
+                  <p className="text-[12px] font-bold tracking-[0.04em] text-[#49372D]">
+                    Pay securely with Stripe
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              {/* BUTTON */}
+              <div className="mt-auto pt-9">
+
+                <Link
+                  href="/date-availability"
+                  className="inline-flex items-center justify-center gap-4 rounded-full bg-[#49372D] px-8 py-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#F5F1E8] transition-all duration-300 hover:-translate-y-1 hover:bg-[#6F7F73]"
+                >
+                  Book online
+                  <span>→</span>
+                </Link>
+
+              </div>
+
+            </article>
+
+
+            {/* ================================================= */}
+            {/* CASH PAYMENT */}
+            {/* ================================================= */}
+
+            <article className="flex min-h-[620px] flex-col rounded-[30px] bg-[#49372D] p-7 text-[#F5F1E8] md:p-10">
+
+              {/* NUMBER */}
+              <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/25">
+
+                <span className="text-[11px] font-bold tracking-[0.16em] text-[#B9DCEF]">
+                  02
+                </span>
+
+              </div>
+
+
+              {/* LABEL */}
+              <p className="mt-10 text-[10px] font-bold uppercase tracking-[0.22em] text-[#B9DCEF]">
+                Cash Payment
+              </p>
+
+
+              {/* TITLE */}
+              <h3 className="mt-7 max-w-lg text-[36px] font-black leading-[1.02] tracking-[-0.045em] text-[#F5F1E8] md:text-[48px]">
+                Book with us and pay on collection
+              </h3>
+
+
+              {/* DESCRIPTION */}
+              <p className="mt-7 max-w-xl text-sm font-medium leading-7 text-[#EADAC8] md:text-base">
+                Contact us on WhatsApp to arrange your scooter. If you are in
+                Tamraght, we can discuss delivery; otherwise, visit our location,
+                collect your scooter and pay in cash.
+              </p>
+
+
+              {/* STEPS */}
+              <div className="mt-10 border-t border-white/15">
+
+                <div className="flex gap-5 border-b border-white/15 py-4">
+
+                  <span className="text-[10px] font-bold tracking-[0.14em] text-[#B9DCEF]">
+                    01
+                  </span>
+
+                  <p className="text-[12px] font-bold tracking-[0.04em] text-[#F5F1E8]">
+                    Message us on WhatsApp
+                  </p>
+
+                </div>
+
+
+                <div className="flex gap-5 border-b border-white/15 py-4">
+
+                  <span className="text-[10px] font-bold tracking-[0.14em] text-[#B9DCEF]">
+                    02
+                  </span>
+
+                  <p className="text-[12px] font-bold tracking-[0.04em] text-[#F5F1E8]">
+                    Find our exact location
+                  </p>
+
+                </div>
+
+
+                <div className="flex gap-5 py-4">
+
+                  <span className="text-[10px] font-bold tracking-[0.14em] text-[#B9DCEF]">
+                    03
+                  </span>
+
+                  <p className="text-[12px] font-bold tracking-[0.04em] text-[#F5F1E8]">
+                    Pay in cash when collecting
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              {/* ACTIONS */}
+              <div className="mt-auto pt-9">
+
+                <a
+                  href="https://wa.me/212623201547"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center justify-center gap-4 rounded-full bg-[#B9DCEF] px-8 py-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#49372D] transition-all duration-300 hover:-translate-y-1 hover:bg-[#DCE4C8]"
+                >
+                  WhatsApp us
+                  <span>→</span>
+                </a>
+
+
+                <a
+                  href="#find-us"
+                  className="mt-5 inline-flex items-center gap-3 border-b border-[#F5F1E8]/40 pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#F5F1E8] transition-colors hover:text-[#B9DCEF]"
+                >
+                  View our location
+                  <span>↓</span>
+                </a>
+
+              </div>
+
+            </article>
+
           </div>
 
         </div>
 
-
-        {/* ACTIONS */}
-        <div className="mt-auto pt-9">
-
-          {/* REPLACE WITH REAL WHATSAPP NUMBER */}
-          <a
-            href="https://wa.me/212623201547"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-4 rounded-full bg-[#B9DCEF] px-8 py-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#49372D] transition-all duration-300 hover:-translate-y-1 hover:bg-[#DCE4C8]"
-          >
-            WhatsApp us
-            <span>→</span>
-          </a>
-
-
-          {/* SCROLL TO LOCATION SECTION */}
-          <a
-            href="#find-us"
-            className="mt-5 inline-flex items-center gap-3 border-b border-[#F5F1E8]/40 pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#F5F1E8] transition-colors hover:text-[#B9DCEF]"
-          >
-            View our location
-            <span>↓</span>
-          </a>
-
-        </div>
-
-      </article>
-
-    </div>
-
-  </div>
-</section>
-
-
+      </section>
 
 
       {/* ================================================= */}
@@ -496,307 +567,367 @@ export default function Home() {
       {/* ================================================= */}
 
       <section className="bg-[#F5F1E8] px-5 py-24 md:px-10 md:py-32 lg:px-14">
+
         <div className="mx-auto max-w-7xl">
-          <div className="mb-14 md:flex md:items-end md:justify-between">
-            <div>
-              <p className="vintage-label text-[#6F7F73]">
-                From the road
-              </p>
 
-              <h2 className="vintage-title retro-shadow mt-5 text-[58px] text-[#49372D] sm:text-[74px] md:text-[92px]">
-                WHAT RIDERS
-                <br />
-                SAY.
-              </h2>
-            </div>
+          {/* CENTERED TITLE */}
+          <div className="mb-14 text-center md:mb-20">
 
-            <p className="mt-5 max-w-sm text-sm font-medium leading-7 text-[#6F7F73] md:mt-0">
+
+            <h2 className="section-title mt-5">
+              FROM THE ROAD
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-md text-sm font-medium leading-7 text-[#6F7F73]">
               Experiences shared by people who explored the coast on two
               electric wheels.
             </p>
+
           </div>
 
+
+          {/* ================================================= */}
+          {/* REVIEW CARDS — ALL CREAMY GREEN */}
+          {/* ================================================= */}
+
           <div className="grid gap-5 md:grid-cols-3">
-            {reviews.map((review, index) => (
+
+            {reviews.map((review) => (
               <article
                 key={review.name}
-                className={`flex min-h-[330px] flex-col justify-between rounded-[26px] p-7 md:p-8 ${
-                  index === 1
-                    ? "bg-[#B9DCEF]"
-                    : index === 2
-                      ? "bg-[#DCE4C8]"
-                      : "bg-white"
-                }`}
+                className="
+                  flex
+                  min-h-[330px]
+                  flex-col
+                  justify-between
+                  rounded-[26px]
+                  border
+                  border-[#49372D]/10
+                  bg-[#DCE4C8]
+                  p-7
+                  transition-all
+                  duration-300
+                  hover:-translate-y-2
+                  hover:shadow-[0_18px_40px_rgba(73,55,45,0.10)]
+                  md:p-8
+                "
               >
+
                 <div>
+
+                  {/* STARS */}
                   <div className="text-[15px] tracking-[0.12em] text-[#49372D]">
                     {"★".repeat(review.rating)}
                   </div>
 
+
+                  {/* REVIEW */}
                   <p className="mt-8 text-[20px] font-bold leading-8 tracking-[-0.025em] text-[#49372D]">
                     “{review.text}”
                   </p>
+
                 </div>
 
+
+                {/* NAME */}
                 <div className="mt-10 border-t border-[#49372D]/15 pt-5">
+
                   <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6F7F73]">
                     {review.name}
                   </p>
+
                 </div>
+
               </article>
             ))}
+
           </div>
+
         </div>
+
       </section>
+
 
       {/* ================================================= */}
       {/* ADD REVIEW */}
-      {/* UI ONLY UNTIL CONNECTED TO BACKEND */}
       {/* ================================================= */}
-<section className="bg-[#F3EFE7] px-5 py-24 md:px-10 md:py-32 lg:px-14">
-  <div className="mx-auto grid max-w-6xl gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-20">
 
-    {/* LEFT CONTENT */}
-    <div>
-      <p className="vintage-label text-[#6F7F73]">
-        Share your ride
-      </p>
+      <section className="bg-[#F3EFE7] px-5 py-24 md:px-10 md:py-32 lg:px-14">
 
-      <h2 className="vintage-title retro-shadow mt-5 text-[58px] text-[#49372D] md:text-[82px]">
-        LEAVE A
-        <br />
-        REVIEW.
-      </h2>
+        <div className="mx-auto max-w-6xl">
 
-      <p className="mt-6 max-w-sm text-sm font-medium leading-7 text-[#6F7F73]">
-        Your review will appear after a quick approval by our team.
-        Safe &amp; simple.
-      </p>
-    </div>
-{/* REVIEW FORM CARD */}
-<form className="rounded-[30px] border-2 border-[#49372D]/15 bg-[#FFFDF8] p-6 shadow-[0_18px_50px_rgba(73,55,45,0.10)] md:p-10">
+          {/* CENTERED TITLE */}
+          <div className="mb-14 text-center md:mb-20">
 
-  {/* FORM HEADER */}
-  <div className="mb-9 border-b border-[#49372D]/10 pb-6">
-    <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#49372D]">
-      Write your review
-    </p>
+            <p className="vintage-label text-[#6F7F73]">
+              Share your ride
+            </p>
 
-    <p className="mt-2 text-xs leading-5 text-[#6F7F73]">
-      Fill in the fields below to share your experience.
-    </p>
-  </div>
+            <h2 className="section-title mt-5">
+              LEAVE A REVIEW.
+            </h2>
+
+            <p className="mx-auto mt-6 max-w-md text-sm font-medium leading-7 text-[#6F7F73]">
+              Your review will appear after a quick approval by our team.
+              Safe &amp; simple.
+            </p>
+
+          </div>
 
 
-  {/* NAME */}
-  <div>
-    <label
-      htmlFor="review-name"
-      className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
-    >
-      Your name
-    </label>
+          {/* ================================================= */}
+          {/* REVIEW FORM */}
+          {/* ================================================= */}
 
-    <input
-      id="review-name"
-      name="name"
-      type="text"
-      placeholder="Enter your name"
-      className="
-        w-full
-        rounded-[14px]
-        border
-        border-[#49372D]/20
-        bg-[#F3EFE7]
-        px-5
-        py-4
-        text-[14px]
-        font-medium
-        text-[#49372D]
-        outline-none
-        transition-all
-        duration-300
-        placeholder:text-[#6F7F73]/60
-        hover:border-[#49372D]/35
-        focus:border-[#6F7F73]
-        focus:bg-white
-        focus:ring-2
-        focus:ring-[#6F7F73]/10
-      "
-    />
-  </div>
+          <form className="mx-auto max-w-3xl rounded-[30px] border-2 border-[#49372D]/15 bg-[#FFFDF8] p-6 shadow-[0_18px_50px_rgba(73,55,45,0.10)] md:p-10">
+
+            {/* FORM HEADER */}
+            <div className="mb-9 border-b border-[#49372D]/10 pb-6">
+
+              <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#49372D]">
+                Write your review
+              </p>
+
+              <p className="mt-2 text-xs leading-5 text-[#6F7F73]">
+                Fill in the fields below to share your experience.
+              </p>
+
+            </div>
 
 
-  {/* RATING */}
-  <div className="mt-6">
-    <label
-      htmlFor="review-rating"
-      className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
-    >
-      Your rating
-    </label>
+            {/* NAME */}
+            <div>
 
-    <select
-      id="review-rating"
-      name="rating"
-      defaultValue="5"
-      className="
-        w-full
-        cursor-pointer
-        rounded-[14px]
-        border
-        border-[#49372D]/20
-        bg-[#F3EFE7]
-        px-5
-        py-4
-        text-[14px]
-        font-medium
-        text-[#49372D]
-        outline-none
-        transition-all
-        duration-300
-        hover:border-[#49372D]/35
-        focus:border-[#6F7F73]
-        focus:bg-white
-        focus:ring-2
-        focus:ring-[#6F7F73]/10
-      "
-    >
-      <option value="5">★★★★★ — Excellent</option>
-      <option value="4">★★★★☆ — Very good</option>
-      <option value="3">★★★☆☆ — Good</option>
-      <option value="2">★★☆☆☆ — Fair</option>
-      <option value="1">★☆☆☆☆ — Poor</option>
-    </select>
-  </div>
+              <label
+                htmlFor="review-name"
+                className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
+              >
+                Your name
+              </label>
+
+              <input
+                id="review-name"
+                name="name"
+                type="text"
+                placeholder="Enter your name"
+                className="
+                  w-full
+                  rounded-[14px]
+                  border
+                  border-[#49372D]/20
+                  bg-[#F3EFE7]
+                  px-5
+                  py-4
+                  text-[14px]
+                  font-medium
+                  text-[#49372D]
+                  outline-none
+                  transition-all
+                  duration-300
+                  placeholder:text-[#6F7F73]/60
+                  hover:border-[#49372D]/35
+                  focus:border-[#6F7F73]
+                  focus:bg-white
+                  focus:ring-2
+                  focus:ring-[#6F7F73]/10
+                "
+              />
+
+            </div>
 
 
-  {/* REVIEW */}
-  <div className="mt-6">
-    <label
-      htmlFor="review-message"
-      className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
-    >
-      Your review
-    </label>
+            {/* RATING */}
+            <div className="mt-6">
 
-    <textarea
-      id="review-message"
-      name="review"
-      rows={6}
-      placeholder="How was your ride? Share your experience..."
-      className="
-        w-full
-        resize-none
-        rounded-[14px]
-        border
-        border-[#49372D]/20
-        bg-[#F3EFE7]
-        px-5
-        py-4
-        text-[14px]
-        font-medium
-        leading-7
-        text-[#49372D]
-        outline-none
-        transition-all
-        duration-300
-        placeholder:text-[#6F7F73]/60
-        hover:border-[#49372D]/35
-        focus:border-[#6F7F73]
-        focus:bg-white
-        focus:ring-2
-        focus:ring-[#6F7F73]/10
-      "
-    />
-  </div>
+              <label
+                htmlFor="review-rating"
+                className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
+              >
+                Your rating
+              </label>
+
+              <select
+                id="review-rating"
+                name="rating"
+                defaultValue="5"
+                className="
+                  w-full
+                  cursor-pointer
+                  rounded-[14px]
+                  border
+                  border-[#49372D]/20
+                  bg-[#F3EFE7]
+                  px-5
+                  py-4
+                  text-[14px]
+                  font-medium
+                  text-[#49372D]
+                  outline-none
+                  transition-all
+                  duration-300
+                  hover:border-[#49372D]/35
+                  focus:border-[#6F7F73]
+                  focus:bg-white
+                  focus:ring-2
+                  focus:ring-[#6F7F73]/10
+                "
+              >
+                <option value="5">★★★★★ — Excellent</option>
+                <option value="4">★★★★☆ — Very good</option>
+                <option value="3">★★★☆☆ — Good</option>
+                <option value="2">★★☆☆☆ — Fair</option>
+                <option value="1">★☆☆☆☆ — Poor</option>
+              </select>
+
+            </div>
 
 
-  {/* SUBMIT */}
-  <button
-    type="button"
-    className="
-      mt-8
-      inline-flex
-      w-full
-      items-center
-      justify-between
-      rounded-full
-      bg-[#49372D]
-      px-7
-      py-4
-      text-[10px]
-      font-bold
-      uppercase
-      tracking-[0.14em]
-      text-[#F5F1E8]
-      transition-all
-      duration-300
-      hover:-translate-y-1
-      hover:bg-[#6F7F73]
-      sm:w-auto
-      sm:min-w-[210px]
-    "
-  >
-    Submit review
+            {/* REVIEW MESSAGE */}
+            <div className="mt-6">
 
-    <span className="ml-8 text-base">
-      ↗
-    </span>
-  </button>
+              <label
+                htmlFor="review-message"
+                className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
+              >
+                Your review
+              </label>
 
-</form>
-  </div>
-</section>
+              <textarea
+                id="review-message"
+                name="review"
+                rows={6}
+                placeholder="How was your ride? Share your experience..."
+                className="
+                  w-full
+                  resize-none
+                  rounded-[14px]
+                  border
+                  border-[#49372D]/20
+                  bg-[#F3EFE7]
+                  px-5
+                  py-4
+                  text-[14px]
+                  font-medium
+                  leading-7
+                  text-[#49372D]
+                  outline-none
+                  transition-all
+                  duration-300
+                  placeholder:text-[#6F7F73]/60
+                  hover:border-[#49372D]/35
+                  focus:border-[#6F7F73]
+                  focus:bg-white
+                  focus:ring-2
+                  focus:ring-[#6F7F73]/10
+                "
+              />
+
+            </div>
+
+
+            {/* SUBMIT */}
+            <div className="mt-8 flex justify-center">
+
+              <button
+                type="button"
+                className="
+                  inline-flex
+                  w-full
+                  items-center
+                  justify-between
+                  rounded-full
+                  bg-[#49372D]
+                  px-7
+                  py-4
+                  text-[10px]
+                  font-bold
+                  uppercase
+                  tracking-[0.14em]
+                  text-[#F5F1E8]
+                  transition-all
+                  duration-300
+                  hover:-translate-y-1
+                  hover:bg-[#6F7F73]
+                  sm:w-auto
+                  sm:min-w-[230px]
+                "
+              >
+                Submit review
+
+                <span className="ml-8 text-base">
+                  ↗
+                </span>
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </section>
+
+
       {/* ================================================= */}
       {/* FIND US */}
       {/* ================================================= */}
 
-      <section className="bg-[#B9DCEF] px-5 pb-16 pt-24 md:px-10 md:pb-20 md:pt-32 lg:px-14">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid items-end gap-8 md:grid-cols-[1fr_0.55fr]">
-            <div>
-              <p className="vintage-label text-[#526B61]">
-                Come say hi
-              </p>
+      <section
+        id="find-us"
+        className="scroll-mt-24 bg-[#B9DCEF] px-5 pb-16 pt-24 md:px-10 md:pb-20 md:pt-32 lg:px-14"
+      >
 
-              <h2 className="vintage-title retro-shadow mt-5 text-[64px] text-[#49372D] sm:text-[82px] md:text-[110px]">
-                FIND US
-                <br />
-                IN TAMRAGHT.
-              </h2>
-            </div>
+        <div className="mx-auto max-w-7xl text-center">
 
-            <div className="md:pb-3">
-              <p className="text-[20px] font-bold tracking-[-0.025em] text-[#49372D]">
-                Tamraght, Morocco
-              </p>
+          <p className="vintage-label text-[#526B61]">
+            Come say hi
+          </p>
 
-              <p className="mt-3 max-w-sm text-sm font-medium leading-7 text-[#526B61]">
-                Close to the beach and ready for your next coastal ride.
-              </p>
 
-              <div className="mt-6 flex flex-wrap gap-2">
-                {["Tamraght", "Coast", "Morocco"].map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full border border-[#49372D]/25 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
+          <h2 className="section-title mt-5">
+            FIND US
+            <br />
+            IN TAMRAGHT.
+          </h2>
+
+
+          <p className="mt-7 text-[20px] font-bold tracking-[-0.025em] text-[#49372D]">
+            Tamraght, Morocco
+          </p>
+
+
+          <p className="mx-auto mt-3 max-w-sm text-sm font-medium leading-7 text-[#526B61]">
+            Close to the beach and ready for your next coastal ride.
+          </p>
+
+
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+
+            {["Tamraght", "Coast", "Morocco"].map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-[#49372D]/25 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
+              >
+                {item}
+              </span>
+            ))}
+
           </div>
+
         </div>
+
       </section>
+
 
       {/* ================================================= */}
       {/* TAMRAGHT MAP */}
       {/* ================================================= */}
 
       <section className="bg-[#B9DCEF] px-5 pb-24 md:px-10 md:pb-32 lg:px-14">
+
         <div className="mx-auto max-w-7xl overflow-hidden rounded-[30px] border-2 border-[#49372D] bg-[#F5F1E8] shadow-[8px_8px_0_#49372D]">
+
           <iframe
             title="Tamraght Map"
             src="https://www.google.com/maps?q=Tamraght%2C%20Morocco&output=embed"
@@ -806,9 +937,12 @@ export default function Home() {
             referrerPolicy="no-referrer-when-downgrade"
             className="block w-full border-0"
           />
+
         </div>
 
+
         <div className="mx-auto mt-5 flex max-w-7xl items-center justify-between gap-4">
+
           <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#526B61]">
             Tamraght · Morocco
           </p>
@@ -821,8 +955,11 @@ export default function Home() {
           >
             Open map ↗
           </a>
+
         </div>
+
       </section>
+
     </>
-  );``
+  );
 }

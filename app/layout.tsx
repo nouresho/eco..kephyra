@@ -1,11 +1,20 @@
 import type { Metadata } from "next";
-import { Archivo_Black, DM_Sans } from "next/font/google";
+import { Archivo_Black, DM_Sans,Playfair_Display,Cormorant_Garamond } from "next/font/google";
 
 import "./globals.css";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-playfair",
+});
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cormorant",
+});
 const archivoBlack = Archivo_Black({
   weight: "400",
   subsets: ["latin"],
@@ -30,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivoBlack.variable} ${dmSans.variable}`}
+      className={`${archivoBlack.variable} ${dmSans.variable} ${cormorant.variable} ${playfair.variable}`}
     >
       <body>
         <Header />
