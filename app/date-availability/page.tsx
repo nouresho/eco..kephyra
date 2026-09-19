@@ -1,25 +1,8 @@
+
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-
-/* ================================================= */
-/* TEMPORARY UNAVAILABLE DATES
-/* Later these dates will come from your database/API.
-/* ================================================= */
-
-const unavailableDates = [
-  "2026-09-01",
-  "2026-09-02",
-  "2026-09-03",
-  "2026-09-04",
-  "2026-09-05",
-  "2026-09-06",
-];
-
-/* ================================================= */
-/* HELPERS */
-/* ================================================= */
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const MONTHS = [
   "January",
@@ -38,6 +21,19 @@ const MONTHS = [
 
 const WEEK_DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
+type AvailabilityResponse = {
+  success: boolean;
+  available?: boolean;
+  totalScooters?: number;
+  unavailableDates?: string[];
+  availabilityByDate?: Record<string, number>;
+  message?: string;
+};
+
+function createDate(year: number, month: number, day: number) {
+  return new Date(year, month, day, 12, 0, 0, 0);
+}
+
 function toDateKey(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -46,30 +42,8 @@ function toDateKey(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-function createDate(year: number, month: number, day: number) {
-  return new Date(year, month, day, 12, 0, 0, 0);
-}
-
-function isSameDate(date1: Date | null, date2: Date | null) {
-  if (!date1 || !date2) return false;
-
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
-}
-
-function startOfDay(date: Date) {
-  return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    12,
-    0,
-    0,
-    0
-  );
+function todayKey() {
+  return toDateKey(new Date());
 }
 
 function formatDate(date: Date | null) {
@@ -80,6 +54,12 @@ function formatDate(date: Date | null) {
     month: "short",
     year: "numeric",
   }).format(date);
+}
+
+function isSameDate(date1: Date | null, date2: Date | null) {
+  if (!date1 || !date2) return false;
+
+  return toDateKey(date1) === toDateKey(date2);
 }
 
 function getRentalDays(startDate: Date | null, endDate: Date | null) {
@@ -97,11 +77,7 @@ function getRentalDays(startDate: Date | null, endDate: Date | null) {
     endDate.getDate()
   );
 
-  const difference = end - start;
-
-  if (difference < 0) return 0;
-
-  return Math.floor(difference / 86400000) + 1;
+  return Math.max(0, Math.floor((end - start) / 86400000) + 1);
 }
 
 function isBetween(
@@ -111,59 +87,69 @@ function isBetween(
 ) {
   if (!startDate || !endDate) return false;
 
-  const current = startOfDay(date).getTime();
-  const start = startOfDay(startDate).getTime();
-  const end = startOfDay(endDate).getTime();
+  const key = toDateKey(date);
 
-  return current > start && current < end;
+  return key > toDateKey(startDate) && key < toDateKey(endDate);
+}
+
+function nextDateKey(key: string) {
+  const date = new Date(`${key}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + 1);
+  return date.toISOString().slice(0, 10);
 }
 
 function rangeContainsUnavailable(
-  startDate: Date,
-  endDate: Date,
+  start: Date,
+  end: Date,
   unavailable: Set<string>
 ) {
-  const current = startOfDay(startDate);
-  const end = startOfDay(endDate);
+  const endKey = toDateKey(end);
 
-  while (current <= end) {
-    if (unavailable.has(toDateKey(current))) {
-      return true;
-    }
-
-    current.setDate(current.getDate() + 1);
+  for (
+    let day = toDateKey(start);
+    day <= endKey;
+    day = nextDateKey(day)
+  ) {
+    if (unavailable.has(day)) return true;
   }
 
   return false;
 }
 
-/* ================================================= */
-/* PAGE */
-/* ================================================= */
+function getMonthRange(year: number, month: number) {
+  return {
+    start: toDateKey(createDate(year, month, 1)),
+    end: toDateKey(createDate(year, month + 1, 0)),
+  };
+}
 
 export default function DateAvailabilityPage() {
-  /*
-   * Demo starts on September 2026 to match your reference.
-   * Later you can change this to:
-   *
-   * const now = new Date();
-   * useState(now.getFullYear());
-   * useState(now.getMonth());
-   */
-
-  const [currentYear, setCurrentYear] = useState(2026);
-  const [currentMonth, setCurrentMonth] = useState(8);
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
+  const [unavailableDates, setUnavailableDates] = useState<string[]>([]);
+  const [availabilityByDate, setAvailabilityByDate] = useState<
+    Record<string, number>
+  >({});
+
+  const [loading, setLoading] = useState(true);
+  const [checkingRange, setCheckingRange] = useState(false);
+  const [error, setError] = useState("");
   const [message, setMessage] = useState(
     "Select a start date on the calendar."
   );
 
+  const currentYear = currentMonth.getFullYear();
+  const currentMonthIndex = currentMonth.getMonth();
+
   const unavailableSet = useMemo(
     () => new Set(unavailableDates),
-    []
+    [unavailableDates]
   );
 
   const rentalDays = useMemo(
@@ -171,29 +157,16 @@ export default function DateAvailabilityPage() {
     [startDate, endDate]
   );
 
-  /* ================================================= */
-  /* CALENDAR DAYS */
-  /* ================================================= */
-
   const calendarDays = useMemo(() => {
-    const firstDay = createDate(currentYear, currentMonth, 1);
+    const firstDay = createDate(currentYear, currentMonthIndex, 1);
 
     const daysInMonth = new Date(
       currentYear,
-      currentMonth + 1,
+      currentMonthIndex + 1,
       0
     ).getDate();
 
-    /*
-     * JS:
-     * Sunday = 0
-     * Monday = 1
-     *
-     * We want Monday first:
-     * Monday = 0 ... Sunday = 6
-     */
     const offset = (firstDay.getDay() + 6) % 7;
-
     const cells: (Date | null)[] = [];
 
     for (let i = 0; i < offset; i++) {
@@ -201,124 +174,177 @@ export default function DateAvailabilityPage() {
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      cells.push(createDate(currentYear, currentMonth, day));
+      cells.push(createDate(currentYear, currentMonthIndex, day));
     }
 
     return cells;
-  }, [currentYear, currentMonth]);
+  }, [currentYear, currentMonthIndex]);
 
-  /* ================================================= */
-  /* MONTH NAVIGATION */
-  /* ================================================= */
+  const fetchAvailability = useCallback(async () => {
+    const { start, end } = getMonthRange(
+      currentYear,
+      currentMonthIndex
+    );
+
+    setLoading(true);
+    setError("");
+    setUnavailableDates([]);
+    setAvailabilityByDate({});
+
+    try {
+      const response = await fetch(
+        `/api/availability?start=${start}&end=${end}`,
+        { cache: "no-store" }
+      );
+
+      const data: AvailabilityResponse = await response.json();
+
+      if (
+        !response.ok ||
+        !data.success ||
+        !Array.isArray(data.unavailableDates) ||
+        !data.availabilityByDate
+      ) {
+        throw new Error(
+          data.message || "Unable to load availability."
+        );
+      }
+
+      setUnavailableDates(data.unavailableDates);
+      setAvailabilityByDate(data.availabilityByDate);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load availability. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [currentYear, currentMonthIndex]);
+
+  useEffect(() => {
+    void fetchAvailability();
+  }, [fetchAvailability]);
 
   const previousMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear((year) => year - 1);
-    } else {
-      setCurrentMonth((month) => month - 1);
-    }
+    const now = new Date();
+    const firstCurrentMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      1
+    );
+
+    if (currentMonth <= firstCurrentMonth) return;
+
+    setCurrentMonth(
+      new Date(currentYear, currentMonthIndex - 1, 1)
+    );
   };
 
   const nextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear((year) => year + 1);
-    } else {
-      setCurrentMonth((month) => month + 1);
-    }
+    setCurrentMonth(
+      new Date(currentYear, currentMonthIndex + 1, 1)
+    );
   };
 
-  /* ================================================= */
-  /* DATE SELECTION */
-  /* ================================================= */
+  const handleDateClick = async (date: Date) => {
+    if (loading || checkingRange || error) return;
 
-  const handleDateClick = (date: Date) => {
     const key = toDateKey(date);
 
-    if (unavailableSet.has(key)) {
-      return;
-    }
+    if (key < todayKey() || unavailableSet.has(key)) return;
 
-    /*
-     * No start OR range already completed:
-     * start a new selection.
-     */
     if (!startDate || endDate) {
       setStartDate(date);
       setEndDate(null);
-
       setMessage("Now select your end date.");
-
       return;
     }
 
-    /*
-     * Clicking before current start:
-     * make it the new start.
-     */
-    if (date < startDate) {
+    if (key < toDateKey(startDate)) {
       setStartDate(date);
       setEndDate(null);
-
       setMessage("Now select your end date.");
-
       return;
     }
 
-    /*
-     * Same start/end date = 1 day rental.
-     */
     if (isSameDate(date, startDate)) {
       setEndDate(date);
-
       setMessage("Your rental period is ready.");
-
       return;
     }
 
-    /*
-     * Do not allow a range crossing unavailable dates.
-     */
-    if (
-      rangeContainsUnavailable(
-        startDate,
-        date,
-        unavailableSet
-      )
-    ) {
+    if (rangeContainsUnavailable(startDate, date, unavailableSet)) {
       setMessage(
-        "This period includes unavailable dates. Please choose another range."
+        "This period includes fully booked dates. Please choose another range."
+      );
+      return;
+    }
+
+    // Check the COMPLETE selected period, including dates in other months.
+    setCheckingRange(true);
+    setMessage("Checking your selected dates...");
+
+    try {
+      const start = toDateKey(startDate);
+      const end = toDateKey(date);
+
+      const response = await fetch(
+        `/api/availability?start=${start}&end=${end}`,
+        { cache: "no-store" }
       );
 
-      return;
+      const data: AvailabilityResponse = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Unable to check your selected dates."
+        );
+      }
+
+      if (!data.available || (data.unavailableDates?.length ?? 0) > 0) {
+        setMessage(
+          "Some dates in this period are fully booked. Please choose another range."
+        );
+
+        // Refresh current month to display any newly booked dates.
+        await fetchAvailability();
+        return;
+      }
+
+      setEndDate(date);
+      setMessage("Your rental period is ready.");
+    } catch (err) {
+      setMessage(
+        err instanceof Error
+          ? err.message
+          : "Unable to check these dates. Please try again."
+      );
+    } finally {
+      setCheckingRange(false);
     }
-
-    setEndDate(date);
-
-    setMessage("Your rental period is ready.");
   };
 
-  /* ================================================= */
-  /* RENDER */
-  /* ================================================= */
+  const canContinue =
+    !!startDate &&
+    !!endDate &&
+    rentalDays > 0 &&
+    !loading &&
+    !checkingRange &&
+    !error &&
+    !rangeContainsUnavailable(startDate, endDate, unavailableSet);
 
   return (
     <main className="overflow-hidden bg-[#F3EFE7] text-[#49372D]">
-
-      {/* ================================================= */}
       {/* HERO */}
-      {/* ================================================= */}
-
       <section className="px-5 pb-14 pt-20 md:px-10 md:pb-20 md:pt-28 lg:px-14">
         <div className="mx-auto max-w-7xl">
-
           <p className="vintage-label text-[#6F7F73]">
             Plan your ride
           </p>
 
           <div className="mt-5 grid items-end gap-8 lg:grid-cols-[1fr_0.55fr]">
-
             <h1 className="vintage-title retro-shadow text-[58px] text-[#49372D] sm:text-[78px] md:text-[105px]">
               CHECK
               <br />
@@ -326,149 +352,108 @@ export default function DateAvailabilityPage() {
             </h1>
 
             <p className="max-w-md text-sm font-medium leading-7 text-[#6F7F73] md:pb-2 md:text-base">
-              Choose your rental period and check which dates
-              are available before continuing with your booking.
+              Choose your rental period, explore live availability,
+              and plan your next ride with confidence.
             </p>
-
           </div>
         </div>
       </section>
 
-
-      {/* ================================================= */}
       {/* CALENDAR */}
-      {/* ================================================= */}
-
       <section className="px-5 pb-28 md:px-10 md:pb-36 lg:px-14">
         <div className="mx-auto max-w-5xl">
-
-          <div
-            className="
-              overflow-hidden
-              rounded-[34px]
-              border
-              border-[#49372D]/15
-              bg-[#FFFDF8]
-              shadow-[0_25px_70px_rgba(73,55,45,0.10)]
-            "
-          >
+          <div className="overflow-hidden rounded-[34px] border border-[#49372D]/15 bg-[#FFFDF8] shadow-[0_25px_70px_rgba(73,55,45,0.10)]">
             <div className="p-5 sm:p-8 md:p-10 lg:p-12">
+              {/* TOP LABEL */}
+              <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#6F7F73]">
+                    ECO KEPHYRA
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[#49372D]">
+                    Find your perfect rental dates
+                  </p>
+                </div>
 
-              {/* ================================================= */}
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#6F7F73]/20 bg-[#DCE4C8]/45 px-4 py-2">
+                  <span className="h-2 w-2 rounded-full bg-[#6F7F73]" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#49372D]">
+                    Live availability
+                  </span>
+                </div>
+              </div>
+
               {/* MONTH HEADER */}
-              {/* ================================================= */}
-
               <div className="flex items-center justify-between gap-4">
-
-                {/* PREVIOUS */}
                 <button
                   type="button"
                   onClick={previousMonth}
+                  disabled={
+                    currentYear === new Date().getFullYear() &&
+                    currentMonthIndex === new Date().getMonth()
+                  }
                   aria-label="Previous month"
-                  className="
-                    flex
-                    h-12
-                    w-12
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-[#EAD9BC]
-                    text-xl
-                    font-bold
-                    text-[#49372D]
-                    transition-all
-                    duration-300
-                    hover:-translate-x-1
-                    hover:bg-[#DCE4C8]
-                    sm:h-14
-                    sm:w-14
-                  "
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#EAD9BC] text-xl font-bold text-[#49372D] transition-all duration-300 hover:-translate-x-1 hover:bg-[#DCE4C8] disabled:cursor-not-allowed disabled:opacity-35 sm:h-14 sm:w-14"
                 >
                   ←
                 </button>
 
-
-                {/* MONTH */}
-                <h2
-                  className="
-                    text-center
-                    text-[25px]
-                    font-black
-                    tracking-[-0.045em]
-                    text-[#49372D]
-                    sm:text-[34px]
-                    md:text-[42px]
-                  "
-                >
-                  {MONTHS[currentMonth]} {currentYear}
+                <h2 className="text-center text-[25px] font-black tracking-[-0.045em] text-[#49372D] sm:text-[34px] md:text-[42px]">
+                  {MONTHS[currentMonthIndex]} {currentYear}
                 </h2>
 
-
-                {/* NEXT */}
                 <button
                   type="button"
                   onClick={nextMonth}
                   aria-label="Next month"
-                  className="
-                    flex
-                    h-12
-                    w-12
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-[#EAD9BC]
-                    text-xl
-                    font-bold
-                    text-[#49372D]
-                    transition-all
-                    duration-300
-                    hover:translate-x-1
-                    hover:bg-[#DCE4C8]
-                    sm:h-14
-                    sm:w-14
-                  "
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#EAD9BC] text-xl font-bold text-[#49372D] transition-all duration-300 hover:translate-x-1 hover:bg-[#DCE4C8] sm:h-14 sm:w-14"
                 >
                   →
                 </button>
-
               </div>
 
+              {/* LOADING / ERROR */}
+              {loading && (
+                <div
+                  role="status"
+                  className="mt-6 rounded-2xl bg-[#B9DCEF]/30 px-5 py-3 text-center text-xs font-semibold text-[#49372D]"
+                >
+                  Loading live availability...
+                </div>
+              )}
 
-              {/* ================================================= */}
+              {error && !loading && (
+                <div
+                  role="alert"
+                  className="mt-6 rounded-2xl border border-[#6B4935]/20 bg-[#EAD9BC]/45 p-4"
+                >
+                  <p className="text-center text-xs font-semibold text-[#49372D]">
+                    {error}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void fetchAvailability()}
+                    className="mx-auto mt-3 block rounded-full bg-[#49372D] px-5 py-2 text-[10px] font-bold uppercase tracking-wider text-[#FFFDF8] transition hover:bg-[#6F7F73]"
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
+
               {/* WEEK DAYS */}
-              {/* ================================================= */}
-
               <div className="mt-10 grid grid-cols-7 gap-1.5 sm:gap-2.5">
-
                 {WEEK_DAYS.map((day) => (
                   <div
                     key={day}
-                    className="
-                      py-2
-                      text-center
-                      text-[7px]
-                      font-black
-                      tracking-[0.08em]
-                      text-[#49372D]/55
-                      sm:text-[9px]
-                      sm:tracking-[0.15em]
-                    "
+                    className="py-2 text-center text-[7px] font-black tracking-[0.08em] text-[#49372D]/55 sm:text-[9px] sm:tracking-[0.15em]"
                   >
                     {day}
                   </div>
                 ))}
-
               </div>
 
-
-              {/* ================================================= */}
               {/* DAYS */}
-              {/* ================================================= */}
-
               <div className="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2.5">
-
                 {calendarDays.map((date, index) => {
                   if (!date) {
                     return (
@@ -480,368 +465,232 @@ export default function DateAvailabilityPage() {
                   }
 
                   const dateKey = toDateKey(date);
+                  const past = dateKey < todayKey();
+                  const fullyBooked = unavailableSet.has(dateKey);
+                  const unavailable = past || fullyBooked;
+                  const disabled =
+                    unavailable || loading || checkingRange || !!error;
 
-                  const unavailable =
-                    unavailableSet.has(dateKey);
+                  const selectedStart = isSameDate(date, startDate);
+                  const selectedEnd = isSameDate(date, endDate);
+                  const selected = selectedStart || selectedEnd;
+                  const inRange = isBetween(
+                    date,
+                    startDate,
+                    endDate
+                  );
 
-                  const selectedStart =
-                    isSameDate(date, startDate);
-
-                  const selectedEnd =
-                    isSameDate(date, endDate);
-
-                  const selected =
-                    selectedStart || selectedEnd;
-
-                  const inRange =
-                    isBetween(date, startDate, endDate);
+                  const remaining = availabilityByDate[dateKey];
 
                   return (
                     <button
                       key={dateKey}
                       type="button"
-                      disabled={unavailable}
-                      onClick={() => handleDateClick(date)}
-                      aria-label={`${formatDate(date)}${
-                        unavailable
-                          ? " unavailable"
-                          : selected
-                            ? " selected"
-                            : " available"
+                      disabled={disabled}
+                      onClick={() => void handleDateClick(date)}
+                      aria-label={`${formatDate(date)} ${
+                        past
+                          ? "past date"
+                          : fullyBooked
+                            ? "fully booked"
+                            : selected
+                              ? "selected"
+                              : "available"
                       }`}
+                      title={
+                        past
+                          ? "Past date"
+                          : fullyBooked
+                            ? "Fully booked"
+                            : remaining !== undefined
+                              ? `${remaining} scooter(s) available`
+                              : "Availability loading"
+                      }
                       className={`
-                        relative
-                        flex
-                        aspect-square
-                        min-w-0
-                        items-center
-                        justify-center
-                        rounded-[10px]
-                        text-[11px]
-                        font-bold
-                        transition-all
-                        duration-200
-                        sm:rounded-[15px]
-                        sm:text-[14px]
-                        md:rounded-[18px]
+                        relative flex aspect-square min-w-0
+                        items-center justify-center rounded-[10px]
+                        text-[11px] font-bold transition-all
+                        duration-200 sm:rounded-[15px]
+                        sm:text-[14px] md:rounded-[18px]
                         md:text-[16px]
-
                         ${
                           unavailable
-                            ? `
-                              cursor-not-allowed
-                              bg-[#E5E3DF]
-                              text-[#49372D]/25
-                            `
+                            ? "cursor-not-allowed bg-[#E5E3DF] text-[#49372D]/30"
                             : selected
-                              ? `
-                                z-10
-                                bg-[#49372D]
-                                text-[#FFFDF8]
-                                shadow-[0_8px_20px_rgba(73,55,45,0.20)]
-                              `
+                              ? "z-10 bg-[#49372D] text-[#FFFDF8] shadow-[0_8px_20px_rgba(73,55,45,0.20)]"
                               : inRange
-                                ? `
-                                  bg-[#DCE4C8]
-                                  text-[#49372D]
-                                `
-                                : `
-                                  bg-[#F3EFE7]
-                                  text-[#49372D]
-                                  hover:-translate-y-1
-                                  hover:bg-[#EAD9BC]
-                                `
+                                ? "bg-[#DCE4C8] text-[#49372D]"
+                                : "bg-[#F3EFE7] text-[#49372D] hover:-translate-y-1 hover:bg-[#EAD9BC]"
+                        }
+                        ${
+                          disabled && !unavailable
+                            ? "cursor-wait opacity-55"
+                            : ""
                         }
                       `}
                     >
-                      {date.getDate()}
+                      <span
+                        className={
+                          unavailable
+                            ? "line-through decoration-[#6B4935]/65 decoration-2"
+                            : ""
+                        }
+                      >
+                        {date.getDate()}
+                      </span>
 
-                      {/* START / END DOT */}
-                      {selected && (
-                        <span
-                          className="
-                            absolute
-                            bottom-[6px]
-                            h-1
-                            w-1
-                            rounded-full
-                            bg-[#B9DCEF]
-                          "
-                        />
+                      {selected && !unavailable && (
+                        <span className="absolute bottom-[6px] h-1 w-1 rounded-full bg-[#B9DCEF]" />
                       )}
                     </button>
                   );
                 })}
-
               </div>
 
-
-              {/* ================================================= */}
               {/* LEGEND */}
-              {/* ================================================= */}
-
-              <div
-                className="
-                  mt-9
-                  flex
-                  flex-wrap
-                  items-center
-                  gap-x-6
-                  gap-y-3
-                  border-t
-                  border-[#49372D]/10
-                  pt-6
-                "
-              >
-
-                {/* AVAILABLE */}
+              <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-[#49372D]/10 pt-6">
                 <div className="flex items-center gap-2">
                   <span className="h-3 w-3 rounded-[3px] bg-[#F3EFE7]" />
-
                   <span className="text-[10px] font-semibold text-[#49372D]/55">
                     Available
                   </span>
                 </div>
 
-
-                {/* SELECTED */}
                 <div className="flex items-center gap-2">
                   <span className="h-3 w-3 rounded-[3px] bg-[#49372D]" />
-
                   <span className="text-[10px] font-semibold text-[#49372D]/55">
                     Selected
                   </span>
                 </div>
 
-
-                {/* RANGE */}
                 <div className="flex items-center gap-2">
                   <span className="h-3 w-3 rounded-[3px] bg-[#DCE4C8]" />
-
                   <span className="text-[10px] font-semibold text-[#49372D]/55">
                     Your range
                   </span>
                 </div>
 
-
-                {/* UNAVAILABLE */}
                 <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-[3px] bg-[#E5E3DF]" />
-
+                  <span className="flex h-3 w-3 items-center justify-center rounded-[3px] bg-[#E5E3DF] text-[9px] font-black leading-none text-[#49372D]/50">
+                    /
+                  </span>
                   <span className="text-[10px] font-semibold text-[#49372D]/55">
-                    Unavailable
+                    Fully booked / past
                   </span>
                 </div>
-
               </div>
 
-
-              {/* ================================================= */}
               {/* YOUR DATES */}
-              {/* ================================================= */}
-
-              <div
-                className="
-                  mt-8
-                  rounded-[24px]
-                  border
-                  border-[#49372D]/10
-                  bg-[#F3EFE7]
-                  p-5
-                  sm:p-7
-                "
-              >
-
+              <div className="mt-8 rounded-[24px] border border-[#49372D]/10 bg-[#F3EFE7] p-5 sm:p-7">
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#49372D]">
                   Your dates
                 </p>
 
-
-                {/* NO DATE */}
                 {!startDate && (
                   <p className="mt-4 text-[16px] font-medium leading-7 text-[#6F7F73] sm:text-[18px]">
                     Select a start date on the calendar.
                   </p>
                 )}
 
-
-                {/* START ONLY */}
                 {startDate && !endDate && (
                   <div className="mt-5">
-
                     <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6F7F73]">
                       Start
                     </p>
-
                     <p className="mt-2 text-[22px] font-black tracking-[-0.035em] text-[#49372D]">
                       {formatDate(startDate)}
                     </p>
-
                     <p className="mt-4 text-[13px] font-medium text-[#6F7F73]">
                       Now choose your end date.
                     </p>
-
                   </div>
                 )}
 
-
-                {/* COMPLETE RANGE */}
                 {startDate && endDate && (
                   <div className="mt-5">
-
                     <div className="grid gap-5 sm:grid-cols-[1fr_auto_1fr_auto] sm:items-center">
-
-                      {/* START */}
                       <div>
                         <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#6F7F73]">
                           Start
                         </p>
-
                         <p className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[#49372D] sm:text-[21px]">
                           {formatDate(startDate)}
                         </p>
                       </div>
 
-
                       <span className="hidden text-[#49372D]/30 sm:block">
                         →
                       </span>
 
-
-                      {/* END */}
                       <div>
                         <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#6F7F73]">
                           End
                         </p>
-
                         <p className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[#49372D] sm:text-[21px]">
                           {formatDate(endDate)}
                         </p>
                       </div>
 
-
-                      {/* DAYS */}
-                      <div
-                        className="
-                          flex
-                          min-h-[76px]
-                          items-center
-                          justify-center
-                          rounded-[18px]
-                          bg-[#DCE4C8]
-                          px-6
-                          text-center
-                        "
-                      >
+                      <div className="flex min-h-[76px] items-center justify-center rounded-[18px] bg-[#DCE4C8] px-6 text-center">
                         <div>
                           <p className="text-[27px] font-black leading-none text-[#49372D]">
                             {rentalDays}
                           </p>
-
                           <p className="mt-1 text-[8px] font-bold uppercase tracking-[0.13em] text-[#6F7F73]">
                             {rentalDays === 1 ? "Day" : "Days"}
                           </p>
                         </div>
                       </div>
-
                     </div>
-
                   </div>
                 )}
 
-
-                {/* STATUS MESSAGE */}
                 {startDate && (
                   <div className="mt-6 border-t border-[#49372D]/10 pt-5">
-
                     <div className="flex items-start gap-3">
-
                       <span
-                        className={`
-                          mt-[6px]
-                          h-2
-                          w-2
-                          shrink-0
-                          rounded-full
-                          ${
-                            startDate && endDate
-                              ? "bg-[#6F7F73]"
-                              : "bg-[#EAD9BC]"
-                          }
-                        `}
+                        className={`mt-[6px] h-2 w-2 shrink-0 rounded-full ${
+                          startDate && endDate
+                            ? "bg-[#6F7F73]"
+                            : "bg-[#EAD9BC]"
+                        }`}
                       />
-
-                      <p className="text-[11px] font-medium leading-5 text-[#6F7F73]">
+                      <p
+                        aria-live="polite"
+                        className="text-[11px] font-medium leading-5 text-[#6F7F73]"
+                      >
                         {message}
                       </p>
-
                     </div>
-
                   </div>
                 )}
-
               </div>
 
-
-              {/* ================================================= */}
               {/* CONTINUE */}
-              {/* ================================================= */}
-
-              {startDate && endDate && rentalDays > 0 && (
+              {canContinue && (
                 <div className="mt-7">
-
                   <Link
                     href={`/reservation?start=${toDateKey(
                       startDate
                     )}&end=${toDateKey(
                       endDate
                     )}&days=${rentalDays}`}
-                    className="
-                      flex
-                      w-full
-                      items-center
-                      justify-between
-                      rounded-full
-                      bg-[#49372D]
-                      px-7
-                      py-5
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-[0.13em]
-                      text-[#F5F1E8]
-                      transition-all
-                      duration-300
-                      hover:-translate-y-1
-                      hover:bg-[#6F7F73]
-                    "
+                    className="flex w-full items-center justify-between rounded-full bg-[#49372D] px-7 py-5 text-[10px] font-bold uppercase tracking-[0.13em] text-[#F5F1E8] transition-all duration-300 hover:-translate-y-1 hover:bg-[#6F7F73]"
                   >
                     <span>Continue to booking</span>
-
-                    <span className="text-base">
-                      ↗
-                    </span>
+                    <span className="text-base">↗</span>
                   </Link>
-
                 </div>
               )}
-
             </div>
           </div>
 
-
-          {/* ================================================= */}
-          {/* SMALL NOTE */}
-          {/* ================================================= */}
-
           <p className="mx-auto mt-6 max-w-xl text-center text-[10px] font-medium leading-5 text-[#6F7F73]/70">
-            Availability shown here is currently for demonstration.
-            Live availability will be connected to the booking system.
+            Availability is checked live. Your booking is only
+            secured after the reservation is successfully submitted.
           </p>
-
         </div>
       </section>
-
     </main>
   );
 }

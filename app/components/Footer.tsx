@@ -128,7 +128,7 @@ export default function Footer() {
           {/* ========================= */}
 
           <a
-            href="mailto:YOUR-EMAIL@gmail.com"
+            href="filioaltone@gmail.com"
             aria-label="Email ECO KEPHYRA"
             className="
               group

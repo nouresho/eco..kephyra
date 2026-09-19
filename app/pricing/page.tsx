@@ -93,25 +93,34 @@ export default function PricingPage() {
           "
         />
 
-        {/* HERO CONTENT */}
-        <div
-          className="
-            relative
-            z-10
-            mx-auto
-            flex
-            min-h-[350px]
-            max-w-7xl
-            items-center
-            justify-center
-            md:min-h-[450px]
-          "
-        >
-          <p className="pricing-script-word pricing-script-word-large">
-            Pricing
-          </p>
-        </div>
-
+       <div className="relative z-10 flex justify-center px-4">
+ <div
+  className="
+    relative z-10
+    mx-auto flex
+    min-h-[350px] max-w-7xl
+    items-center justify-center
+    md:min-h-[450px]
+  "
+>
+ <h1
+  className="
+    pricing-script-word
+    pricing-script-word-large
+    relative z-10
+    !m-0
+    text-center
+    !text-[#F1D7AD]
+    !!text-[clamp(8rem,24vw,20rem)]
+    leading-none
+    drop-shadow-[0_4px_5px_rgba(35,25,18,0.75)]
+    [-webkit-text-stroke:1px_#49372D]
+  "
+>
+  Pricing
+</h1>
+  </div>
+</div>
         <WavyDivider color="#F5F1E8" />
       </section>
 
