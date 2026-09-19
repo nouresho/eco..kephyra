@@ -331,7 +331,7 @@ export default function HomeReviews() {
                   sm:min-w-[230px]
                 "
               >
-                {sending ? 'Sending…' : 'Submit review'}
+                {sending ? 'Sending…' : 'Submit review '}
 
 
               </button>

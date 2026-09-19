@@ -55,7 +55,7 @@ export default function PricingPage() {
     md:px-12
   "
 >
-  {/* BACKGROUND IMAGE */}
+  {/* BACKGROUND IMAGE pricing*/}
   <div className="absolute inset-0 z-0 bg-[url('/images/story.png')] bg-cover bg-center bg-no-repeat" />
 
   {/* OVERLAY */}

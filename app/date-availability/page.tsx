@@ -726,7 +726,7 @@ export default function DateAvailabilityPage() {
                 )}
               </div>
 
-              {/* CONTINUE */}
+              {/* CONTINUE d*/}
               {canContinue && (
                 <div className="mt-7">
                   <Link
