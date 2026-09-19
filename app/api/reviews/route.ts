@@ -22,8 +22,14 @@ export async function GET() {
   } catch { return response({ message: 'Reviews are temporarily unavailable.' }, 503); }
 }
 export async function POST(request: NextRequest) {
-  const origin = process.env.ADMIN_APP_ORIGIN;
-  if (!origin || request.headers.get('origin') !== origin) return response({ message: 'Request origin not allowed.' }, 403);
+  const reqOrigin = request.headers.get('origin');
+const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+let sameOrigin = false;
+try { sameOrigin = !!reqOrigin && new URL(reqOrigin).host === host; } catch {}
+const allowed = (process.env.ADMIN_APP_ORIGIN ?? '').split(',').map(s => s.trim()).filter(Boolean);
+if (!reqOrigin || (!sameOrigin && !allowed.includes(reqOrigin))) {
+  return response({ message: 'Request origin not allowed.' }, 403);
+}
   if (!request.headers.get('content-type')?.startsWith('application/json')) return response({ message: 'JSON required.' }, 415);
   try {
     const reader = request.body?.getReader();
