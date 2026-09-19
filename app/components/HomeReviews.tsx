@@ -333,9 +333,6 @@ export default function HomeReviews() {
               >
                 {sending ? 'Sending…' : 'Submit review'}
 
-                <span className="ml-8 text-base">
-                  ↗
-                </span>
 
               </button>
 

@@ -41,88 +41,31 @@ export default function PricingPage() {
       {/* ================================================= */}
       {/* HERO */}
       {/* ================================================= */}
-
-      <section
-        className="
-          pricing-hero
-          relative
-          min-h-[520px]
-          overflow-hidden
-          px-6
-          pb-32
-          pt-20
-          md:min-h-[650px]
-          md:px-12
-          md:pb-40
-          md:pt-28
-        "
-      >
-        {/* BACKGROUND IMAGE */}
-        <div
-          className="
-            absolute
-            inset-0
-            z-0
-            bg-[url('/images/story.png')]
-            bg-cover
-            bg-center
-            bg-no-repeat
-          "
-        />
-
-        {/* LIGHT VINTAGE OVERLAY */}
-        <div
-          className="
-            absolute
-            inset-0
-            z-[1]
-            
-          "
-        />
-
-        {/* SOFT GRADIENT */}
-        <div
-          className="
-            absolute
-            inset-0
-            z-[2]
-            bg-gradient-to-b
-            from-[#F3EFE7]/20
-            via-transparent
-            to-[#F3EFE7]/55
-          "
-        />
-
-       <div className="relative z-10 flex justify-center px-4">
- <div
+<section
   className="
-    relative z-10
-    mx-auto flex
-    min-h-[350px] max-w-7xl
-    items-center justify-center
-    md:min-h-[450px]
+    pricing-hero
+    relative
+    flex
+    min-h-[520px]
+    items-center
+    justify-center
+    overflow-hidden
+    px-6
+    md:min-h-[650px]
+    md:px-12
   "
 >
- <h1
-  className="
-    pricing-script-word
-    pricing-script-word-large
-    relative z-10
-    !m-0
-    text-center
-    !text-[#F1D7AD]
-    !!text-[clamp(8rem,24vw,20rem)]
-    leading-none
-    drop-shadow-[0_4px_5px_rgba(35,25,18,0.75)]
-    [-webkit-text-stroke:1px_#49372D]
-  "
->
-  Pricing
-</h1>
-  </div>
-</div>
-        <WavyDivider color="#F5F1E8" />
-      </section>
+  {/* BACKGROUND IMAGE */}
+  <div className="absolute inset-0 z-0 bg-[url('/images/story.png')] bg-cover bg-center bg-no-repeat" />
+
+  {/* OVERLAY */}
+  <div className="absolute inset-0 z-0 bg-black/30" />
+
+  {/* TITLE F LWEST */}
+<h2 className="section-title relative z-10 text-center !text-white !text-6xl md:!text-8xl">
+    PRICING
+  </h2>
+</section>
 
 
       {/* ================================================= */}

@@ -1,8 +1,7 @@
-
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const MONTHS = [
   "January",
@@ -144,6 +143,14 @@ export default function DateAvailabilityPage() {
     "Select a start date on the calendar."
   );
 
+  /* ---------- SWIPE STATE (mois) ---------- */
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isHorizontalSwipe = useRef<boolean | null>(null);
+
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
   const currentYear = currentMonth.getFullYear();
   const currentMonthIndex = currentMonth.getMonth();
 
@@ -246,6 +253,46 @@ export default function DateAvailabilityPage() {
     setCurrentMonth(
       new Date(currentYear, currentMonthIndex + 1, 1)
     );
+  };
+
+  /* ================================================= */
+  /* SWIPE HANDLERS */
+  /* ================================================= */
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isHorizontalSwipe.current = null;
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const dx = e.touches[0].clientX - touchStartX.current;
+    const dy = e.touches[0].clientY - touchStartY.current;
+
+    // wach swipe horizontal wla scroll vertical
+    if (
+      isHorizontalSwipe.current === null &&
+      (Math.abs(dx) > 8 || Math.abs(dy) > 8)
+    ) {
+      isHorizontalSwipe.current = Math.abs(dx) > Math.abs(dy);
+    }
+
+    if (isHorizontalSwipe.current) {
+      // 0.5 = l calendrier kaytbe3 sba3ek b chwiya dyal résistance
+      setDragX(dx * 0.5);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (isHorizontalSwipe.current && Math.abs(dragX) > 30) {
+      if (dragX < 0) nextMonth();
+      else previousMonth();
+    }
+
+    setDragX(0);
+    setIsDragging(false);
+    isHorizontalSwipe.current = null;
   };
 
   const handleDateClick = async (date: Date) => {
@@ -440,111 +487,124 @@ export default function DateAvailabilityPage() {
                 </div>
               )}
 
-              {/* WEEK DAYS */}
-              <div className="mt-10 grid grid-cols-7 gap-1.5 sm:gap-2.5">
-                {WEEK_DAYS.map((day) => (
-                  <div
-                    key={day}
-                    className="py-2 text-center text-[7px] font-black tracking-[0.08em] text-[#49372D]/55 sm:text-[9px] sm:tracking-[0.15em]"
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              {/* DAYS */}
-              <div className="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2.5">
-                {calendarDays.map((date, index) => {
-                  if (!date) {
-                    return (
-                      <div
-                        key={`empty-${index}`}
-                        className="aspect-square"
-                      />
-                    );
-                  }
-
-                  const dateKey = toDateKey(date);
-                  const past = dateKey < todayKey();
-                  const fullyBooked = unavailableSet.has(dateKey);
-                  const unavailable = past || fullyBooked;
-                  const disabled =
-                    unavailable || loading || checkingRange || !!error;
-
-                  const selectedStart = isSameDate(date, startDate);
-                  const selectedEnd = isSameDate(date, endDate);
-                  const selected = selectedStart || selectedEnd;
-                  const inRange = isBetween(
-                    date,
-                    startDate,
-                    endDate
-                  );
-
-                  const remaining = availabilityByDate[dateKey];
-
-                  return (
-                    <button
-                      key={dateKey}
-                      type="button"
-                      disabled={disabled}
-                      onClick={() => void handleDateClick(date)}
-                      aria-label={`${formatDate(date)} ${
-                        past
-                          ? "past date"
-                          : fullyBooked
-                            ? "fully booked"
-                            : selected
-                              ? "selected"
-                              : "available"
-                      }`}
-                      title={
-                        past
-                          ? "Past date"
-                          : fullyBooked
-                            ? "Fully booked"
-                            : remaining !== undefined
-                              ? `${remaining} scooter(s) available`
-                              : "Availability loading"
-                      }
-                      className={`
-                        relative flex aspect-square min-w-0
-                        items-center justify-center rounded-[10px]
-                        text-[11px] font-bold transition-all
-                        duration-200 sm:rounded-[15px]
-                        sm:text-[14px] md:rounded-[18px]
-                        md:text-[16px]
-                        ${
-                          unavailable
-                            ? "cursor-not-allowed bg-[#E5E3DF] text-[#49372D]/30"
-                            : selected
-                              ? "z-10 bg-[#49372D] text-[#FFFDF8] shadow-[0_8px_20px_rgba(73,55,45,0.20)]"
-                              : inRange
-                                ? "bg-[#DCE4C8] text-[#49372D]"
-                                : "bg-[#F3EFE7] text-[#49372D] hover:-translate-y-1 hover:bg-[#EAD9BC]"
-                        }
-                        ${
-                          disabled && !unavailable
-                            ? "cursor-wait opacity-55"
-                            : ""
-                        }
-                      `}
+              {/* SWIPE AREA: jours + dates */}
+              <div
+                className="touch-pan-y select-none transition-transform duration-300 ease-out"
+                style={{
+                  transform: `translateX(${dragX}px)`,
+                  transition: isDragging ? "none" : undefined,
+                }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onTouchCancel={handleTouchEnd}
+              >
+                {/* WEEK DAYS */}
+                <div className="mt-10 grid grid-cols-7 gap-1.5 sm:gap-2.5">
+                  {WEEK_DAYS.map((day) => (
+                    <div
+                      key={day}
+                      className="py-2 text-center text-[7px] font-black tracking-[0.08em] text-[#49372D]/55 sm:text-[9px] sm:tracking-[0.15em]"
                     >
-                      <span
-                        className={
-                          unavailable
-                            ? "line-through decoration-[#6B4935]/65 decoration-2"
-                            : ""
-                        }
-                      >
-                        {date.getDate()}
-                      </span>
+                      {day}
+                    </div>
+                  ))}
+                </div>
 
-                      {selected && !unavailable && (
-                        <span className="absolute bottom-[6px] h-1 w-1 rounded-full bg-[#B9DCEF]" />
-                      )}
-                    </button>
-                  );
-                })}
+                {/* DAYS */}
+                <div className="mt-2 grid grid-cols-7 gap-1.5 sm:gap-2.5">
+                  {calendarDays.map((date, index) => {
+                    if (!date) {
+                      return (
+                        <div
+                          key={`empty-${index}`}
+                          className="aspect-square"
+                        />
+                      );
+                    }
+
+                    const dateKey = toDateKey(date);
+                    const past = dateKey < todayKey();
+                    const fullyBooked = unavailableSet.has(dateKey);
+                    const unavailable = past || fullyBooked;
+                    const disabled =
+                      unavailable || loading || checkingRange || !!error;
+
+                    const selectedStart = isSameDate(date, startDate);
+                    const selectedEnd = isSameDate(date, endDate);
+                    const selected = selectedStart || selectedEnd;
+                    const inRange = isBetween(
+                      date,
+                      startDate,
+                      endDate
+                    );
+
+                    const remaining = availabilityByDate[dateKey];
+
+                    return (
+                      <button
+                        key={dateKey}
+                        type="button"
+                        disabled={disabled}
+                        onClick={() => void handleDateClick(date)}
+                        aria-label={`${formatDate(date)} ${
+                          past
+                            ? "past date"
+                            : fullyBooked
+                              ? "fully booked"
+                              : selected
+                                ? "selected"
+                                : "available"
+                        }`}
+                        title={
+                          past
+                            ? "Past date"
+                            : fullyBooked
+                              ? "Fully booked"
+                              : remaining !== undefined
+                                ? `${remaining} scooter(s) available`
+                                : "Availability loading"
+                        }
+                        className={`
+                          relative flex aspect-square min-w-0
+                          items-center justify-center rounded-[10px]
+                          text-[11px] font-bold transition-all
+                          duration-200 sm:rounded-[15px]
+                          sm:text-[14px] md:rounded-[18px]
+                          md:text-[16px]
+                          ${
+                            unavailable
+                              ? "cursor-not-allowed bg-[#E5E3DF] text-[#49372D]/30"
+                              : selected
+                                ? "z-10 bg-[#49372D] text-[#FFFDF8] shadow-[0_8px_20px_rgba(73,55,45,0.20)]"
+                                : inRange
+                                  ? "bg-[#DCE4C8] text-[#49372D]"
+                                  : "bg-[#F3EFE7] text-[#49372D] hover:-translate-y-1 hover:bg-[#EAD9BC]"
+                          }
+                          ${
+                            disabled && !unavailable
+                              ? "cursor-wait opacity-55"
+                              : ""
+                          }
+                        `}
+                      >
+                        <span
+                          className={
+                            unavailable
+                              ? "line-through decoration-[#6B4935]/65 decoration-2"
+                              : ""
+                          }
+                        >
+                          {date.getDate()}
+                        </span>
+
+                        {selected && !unavailable && (
+                          <span className="absolute bottom-[6px] h-1 w-1 rounded-full bg-[#B9DCEF]" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* LEGEND */}
