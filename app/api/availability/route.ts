@@ -17,12 +17,6 @@ function isValidDate(value: string): boolean {
   );
 }
 
-function nextDay(value: string): string {
-  const date = new Date(`${value}T00:00:00.000Z`);
-  date.setUTCDate(date.getUTCDate() + 1);
-
-  return date.toISOString().slice(0, 10);
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -113,57 +107,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 3. Get reservations overlapping the requested dates
-    const { data: reservations, error: reservationsError } =
-      await supabaseAdmin
-        .from("reservations")
-        .select("start_date, end_date")
-        .in("status", ["pending", "confirmed"])
-        .lte("start_date", endDate)
-        .gte("end_date", startDate);
-
-    if (reservationsError) {
-      console.error("SUPABASE RESERVATIONS ERROR:", {
-        message: reservationsError.message,
-        code: reservationsError.code,
-        details: reservationsError.details,
-        hint: reservationsError.hint,
-      });
-
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unable to check reservations.",
-        },
-        { status: 500 }
-      );
-    }
-
-    // 4. Calculate availability for EACH day
+    const { error: expiryError } = await supabaseAdmin.rpc('ec_paypal_expire');
+    if (expiryError) throw new Error('Unable to release expired checkouts');
+    const { data: days, error: availabilityError } = await supabaseAdmin.rpc('ec_availability', { p_start: startDate, p_end: endDate });
+    if (availabilityError || !days || days.length !== totalDays) throw new Error('Unable to check availability');
     const unavailableDates: string[] = [];
     const availabilityByDate: Record<string, number> = {};
-
-    for (
-      let day = startDate;
-      day <= endDate;
-      day = nextDay(day)
-    ) {
-      const reservedScooters = (reservations ?? []).filter(
-        (reservation) =>
-          reservation.start_date <= day &&
-          reservation.end_date >= day
-      ).length;
-
-      const remainingScooters = Math.max(
-        totalScooters - reservedScooters,
-        0
-      );
-
-      availabilityByDate[day] = remainingScooters;
-
-      if (remainingScooters === 0) {
-        unavailableDates.push(day);
-      }
+    for (const row of days) {
+      availabilityByDate[row.day] = row.available_scooters;
+      if (row.available_scooters === 0) unavailableDates.push(row.day);
     }
 
     // 5. Return calendar data

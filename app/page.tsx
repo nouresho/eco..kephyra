@@ -611,7 +611,7 @@ export default function Home() {
 
           <iframe
             title="Tamraght Map"
-            src="https://www.google.com/maps?q=Tamraght%2C%20Morocco&output=embed"
+            src="https://www.google.com/maps/place/30%C2%B030'54.4%22N+9%C2%B040'52.6%22W/@30.5151062,-9.6838455,798m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d30.5151062!4d-9.6812706?hl=fr&entry=ttu&g_ep=EgoyMDI2MDkxNi4wIKXMDSoASAFQAw%3D%3D"
             width="100%"
             height="520"
             loading="lazy"

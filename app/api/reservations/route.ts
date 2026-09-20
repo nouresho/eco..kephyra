@@ -157,6 +157,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { error: expiryError } = await supabaseAdmin.rpc("ec_paypal_expire");
+    if (expiryError) throw new Error("Unable to release expired checkouts");
+
     // 4. Get the total number of scooters
     const { data: settings, error: settingsError } =
       await supabaseAdmin
@@ -271,6 +274,7 @@ export async function POST(request: NextRequest) {
         .select("id")
         .single();
 
+    if (insertError?.message.includes("EC_CAPACITY")) return NextResponse.json({ success: false, message: "These dates have just sold out. Please select another period." }, { status: 409 });
     if (insertError || !reservation) {
       console.error("SUPABASE INSERT ERROR:", insertError);
 

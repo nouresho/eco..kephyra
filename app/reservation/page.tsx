@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
+import PayPalCheckout from "../components/PayPalCheckout";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type PaymentMethod = "online" | "cash";
@@ -154,7 +155,7 @@ function ReservationForm() {
 
     if (paymentMethod === "online") {
       setError(
-        "Online payment is not available yet. Please choose Pay Cash via WhatsApp."
+        "Use the PayPal button below to see your EUR total."
       );
       return;
     }
@@ -386,15 +387,15 @@ function ReservationForm() {
                   </div>
 
                   <p className="mt-5 text-sm font-black">
-                    Book Online
+                    PayPal
                   </p>
 
                   <p className="mt-2 text-xs leading-5 text-[#6F7F73]">
-                    Pay securely online to complete your booking.
+                    Pay the full rental amount securely in EUR with PayPal.
                   </p>
 
                   <span className="mt-4 self-start rounded-full bg-[#EAD9BC] px-3 py-1 text-[9px] font-black uppercase tracking-wider">
-                    Coming soon
+                    Secure checkout
                   </span>
                 </label>
 
@@ -476,33 +477,23 @@ function ReservationForm() {
             )}
 
             {/* SUBMIT */}
-            <button
-              type="submit"
-              disabled={
-                checking ||
-                submitting ||
-                !available ||
-                totalDays < 1 ||
-                paymentMethod === "online"
-              }
-              className="mt-8 flex w-full items-center justify-between rounded-full bg-[#49372D] px-7 py-5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#FFFDF8] transition hover:bg-[#6F7F73] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <span>
-                {submitting
-                  ? "Submitting your request..."
-                  : paymentMethod === "online"
-                  ? "Online payment coming soon"
-                  : "Continue to WhatsApp"}
-              </span>
-
-              <span className="text-lg">↗</span>
-            </button>
-
-            <p className="mt-4 text-center text-[11px] leading-5 text-[#6F7F73]">
-              {paymentMethod === "cash"
-                ? "Your request will be saved first. You can then send your booking reference via WhatsApp."
-                : "Online payment will be available once the secure payment service is connected."}
-            </p>
+            {paymentMethod === "online" ? (
+              <PayPalCheckout booking={{ customer_name: customerName, customer_email: customerEmail, customer_phone: customerPhone, start_date: startDate, end_date: endDate }} disabled={checking || submitting || !available || totalDays < 1} />
+            ) : (
+              <>
+                <button
+                  type="submit"
+                  disabled={checking || submitting || !available || totalDays < 1}
+                  className="mt-8 flex w-full items-center justify-between rounded-full bg-[#49372D] px-7 py-5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#FFFDF8] transition hover:bg-[#6F7F73] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span>{submitting ? "Submitting your request..." : "Continue to WhatsApp"}</span>
+                  <span className="text-lg">↗</span>
+                </button>
+                <p className="mt-4 text-center text-[11px] leading-5 text-[#6F7F73]">
+                  Your request will be saved first. You can then send your booking reference via WhatsApp.
+                </p>
+              </>
+            )}
           </form>
 
           {/* BOOKING SUMMARY */}
