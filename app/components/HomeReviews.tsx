@@ -209,11 +209,7 @@ export default function HomeReviews() {
             </div>
 
 
-            {/* EMAIL */}
-            <div className="mt-6">
-              <label htmlFor="review-email" className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#49372D]">Your email (not published)</label>
-              <input id="review-email" name="email" type="email" required maxLength={254} autoComplete="email" className="w-full rounded-[14px] border border-[#49372D]/20 bg-[#F3EFE7] px-5 py-4 text-[14px] text-[#49372D] focus:ring-2 focus:ring-[#6F7F73]/30" />
-            </div>
+
             <div hidden aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
             {/* RATING */}
             <div className="mt-6">
