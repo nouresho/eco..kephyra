@@ -132,17 +132,14 @@ export default function HomeReviews() {
           {/* CENTERED TITLE */}
           <div className="mb-14 text-center md:mb-20">
 
-            <p className="vintage-label text-[#6F7F73]">
-              Share your ride
-            </p>
+
 
             <h2 className="section-title mt-5">
               LEAVE A REVIEW.
             </h2>
 
             <p className="mx-auto mt-6 max-w-md text-sm font-medium leading-7 text-[#6F7F73]">
-              Your review will appear after a quick approval by our team.
-              Safe &amp; simple.
+Share your ride
             </p>
 
           </div>
@@ -175,7 +172,7 @@ export default function HomeReviews() {
                 htmlFor="review-name"
                 className="mb-2.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#49372D]"
               >
-                Your name
+                YOUR FULL NAME
               </label>
 
               <input
