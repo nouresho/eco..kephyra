@@ -29,7 +29,7 @@ export async function session(token?: string) {
   return data;
 }
 export function details(row: any) {
-  return { id: row.id, reservationId: String(row.reservation_id), state: row.state, mad: Number(row.mad_total).toFixed(2), eur: Number(row.eur_total).toFixed(2), rate: row.fx_rate, rateDate: row.fx_date, expiresAt: row.expires_at, mode: row.environment, approveUrl: row.approve_url };
+  return { scooterQuantity: row.scooter_quantity ?? 1, id: row.id, reservationId: String(row.reservation_id), state: row.state, mad: Number(row.mad_total).toFixed(2), eur: Number(row.eur_total).toFixed(2), rate: row.fx_rate, rateDate: row.fx_date, expiresAt: row.expires_at, mode: row.environment, approveUrl: row.approve_url };
 }
 export function verifyOrder(order: any, row: any) {
   const units = order.purchase_units;

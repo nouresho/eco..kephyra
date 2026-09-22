@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
         '[PAYPAL] STEP 8: Reserving booking'
       );
 
-      row = await rpc('ec_paypal_reserve', {
+      row = await rpc('ec_paypal_reserve_quantity', {
         p_hash: tokenHash,
         p_fingerprint: fingerprint,
         p_booking: booking,
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
                 `ECO-${c.mode}-${row.id}`,
 
               description:
-                `Scooter rental ${booking.start_date} to ${booking.end_date}`,
+                `${booking.scooter_quantity} scooter(s): ${booking.start_date} to ${booking.end_date}`,
 
               amount: {
                 currency_code: 'EUR',

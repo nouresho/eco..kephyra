@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from 'react';
-type Booking = { customer_name: string; customer_email: string; customer_phone: string; start_date: string; end_date: string };
-type Quote = { state: string; mad: string; eur: string; rateDate: string; expiresAt: string; approveUrl: string; mode: string };
+type Booking = { scooter_quantity: number; customer_name: string; customer_email: string; customer_phone: string; start_date: string; end_date: string };
+type Quote = { scooterQuantity: number; state: string; mad: string; eur: string; rateDate: string; expiresAt: string; approveUrl: string; mode: string };
 export default function PayPalCheckout({ disabled, booking }: { disabled: boolean; booking: Booking }) {
   const [busy, setBusy] = useState(false), [error, setError] = useState('');
   const [quote, setQuote] = useState<{ key: string; value: Quote } | null>(null);
@@ -29,9 +29,9 @@ export default function PayPalCheckout({ disabled, booking }: { disabled: boolea
   const current = quote?.key === key ? quote.value : null;
   return <div className="mt-8 space-y-4">
     {current ? <div className="rounded-2xl border border-[#49372D]/15 bg-[#F3EFE7] p-5">
-      <p className="font-bold">Full rental: {current.mad} MAD</p>
+      <p className="font-bold">{current.scooterQuantity} scooter(s) · Full rental: {current.mad} MAD</p>
       <p className="mt-2 text-2xl font-black">Pay {current.eur} EUR</p>
-      <p className="mt-2 text-xs leading-5 text-[#6F7F73]">Converted using the daily rate dated {current.rateDate}. Your quote and scooter are held until {new Date(current.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Your card issuer may apply its own conversion or fees.</p>
+      <p className="mt-2 text-xs leading-5 text-[#6F7F73]">Converted using the daily rate dated {current.rateDate}. Your quote and scooters are held until {new Date(current.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Your card issuer may apply its own conversion or fees.</p>
       {current.mode === 'sandbox' && <p className="mt-3 text-sm font-bold">Test mode — no real payment.</p>}
       <a href={current.approveUrl} className="mt-4 block rounded-full bg-[#FFC439] px-6 py-4 text-center font-bold text-[#003087]">Pay {current.eur} EUR with PayPal →</a>
     </div> : <button type="button" disabled={disabled || busy} onClick={event => void prepare(event.currentTarget)} className="w-full rounded-full bg-[#FFC439] px-7 py-5 font-bold text-[#003087] disabled:opacity-50">{busy ? 'Preparing your payment…' : 'Continue with PayPal →'}</button>}

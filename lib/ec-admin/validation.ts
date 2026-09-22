@@ -37,6 +37,7 @@ export function booking(value: unknown) {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(token)) throw new Error('Invalid request ID');
   if (typeof b.total_price !== 'number' || !Number.isFinite(b.total_price) || b.total_price < 0 || b.total_price > 99999999.99 || Math.abs(b.total_price * 100 - Math.round(b.total_price * 100)) > 0.00001) throw new Error('Invalid price');
   return { customer_name: text(b.customer_name, 2, 120), customer_email: email, customer_phone: phone,
+    scooter_quantity: integer(b.scooter_quantity === undefined ? 1 : b.scooter_quantity, 1, 10000),
     start_date: start, end_date: end, total_days: days, total_price: b.total_price,
     payment_method: choice(b.payment_method, ['cash', 'online']),
     status: 'confirmed', payment_status: 'unpaid', admin_request_id: token, booking_source: 'whatsapp' };

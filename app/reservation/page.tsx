@@ -16,6 +16,7 @@ type PaymentMethod = "online" | "cash";
 type AvailabilityResponse = {
   success: boolean;
   available?: boolean;
+  availabilityByDate?: Record<string, number>;
   message?: string;
 };
 
@@ -76,7 +77,9 @@ function ReservationForm() {
 
   const totalDays = calculateDays(startDate, endDate);
   const dailyRate = getDailyRate(totalDays);
-  const totalPrice = totalDays * dailyRate;
+  const [scooterQuantity, setScooterQuantity] = useState(1);
+  const [maxScooters, setMaxScooters] = useState(0);
+  const totalPrice = totalDays * dailyRate * scooterQuantity;
 
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -89,6 +92,7 @@ function ReservationForm() {
   const [available, setAvailable] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const enoughScooters = available && Number.isInteger(scooterQuantity) && scooterQuantity >= 1 && scooterQuantity <= maxScooters;
 
   useEffect(() => {
     if (totalDays < 1) {
@@ -123,6 +127,8 @@ function ReservationForm() {
           );
         }
 
+        const remaining = Object.values(data.availabilityByDate ?? {});
+        setMaxScooters(remaining.length === totalDays ? Math.min(...remaining) : 0);
         setAvailable(Boolean(data.available));
       } catch (err) {
         if (controller.signal.aborted) return;
@@ -147,7 +153,7 @@ function ReservationForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (submitting || checking || !available || totalDays < 1) {
+    if (submitting || checking || !enoughScooters || totalDays < 1) {
       return;
     }
 
@@ -175,6 +181,7 @@ function ReservationForm() {
           start_date: startDate,
           end_date: endDate,
           payment_method: "cash",
+          scooter_quantity: scooterQuantity,
         }),
       });
 
@@ -331,6 +338,12 @@ function ReservationForm() {
               </div>
             </div>
 
+            <div className="mt-8">
+              <label htmlFor="scooter-quantity" className="mb-2 block text-sm font-bold">Number of scooters</label>
+              <input id="scooter-quantity" type="number" min={1} max={Math.max(1, maxScooters)} step={1} required value={scooterQuantity || ''} disabled={checking || submitting} onChange={e => { setScooterQuantity(e.target.value === '' ? 0 : Number(e.target.value)); setError(''); }} aria-describedby="scooter-availability" className="w-full rounded-2xl border border-[#49372D]/15 bg-[#F3EFE7]/60 px-5 py-4 text-sm" />
+              <p id="scooter-availability" className="mt-2 text-xs text-[#6F7F73]">{checking ? 'Checking availability…' : `${maxScooters} scooter(s) available for your entire stay.`}</p>
+            </div>
+
             {/* PAYMENT METHOD */}
             <div className="mt-10 border-t border-[#49372D]/10 pt-8">
               <div className="flex items-center gap-3">
@@ -460,10 +473,10 @@ function ReservationForm() {
               </p>
             )}
 
-            {!checking && !available && !error && (
+            {!checking && !enoughScooters && !error && (
               <p className="mt-7 rounded-2xl bg-[#EAD9BC]/55 p-4 text-xs font-semibold">
-                These dates are no longer available. Please
-                choose another period.
+                Not enough scooters for this selection. Please
+                reduce the quantity or choose another period.
               </p>
             )}
 
@@ -478,12 +491,12 @@ function ReservationForm() {
 
             {/* SUBMIT */}
             {paymentMethod === "online" ? (
-              <PayPalCheckout booking={{ customer_name: customerName, customer_email: customerEmail, customer_phone: customerPhone, start_date: startDate, end_date: endDate }} disabled={checking || submitting || !available || totalDays < 1} />
+              <PayPalCheckout booking={{ customer_name: customerName, customer_email: customerEmail, customer_phone: customerPhone, start_date: startDate, end_date: endDate, scooter_quantity: scooterQuantity }} disabled={checking || submitting || !enoughScooters || totalDays < 1} />
             ) : (
               <>
                 <button
                   type="submit"
-                  disabled={checking || submitting || !available || totalDays < 1}
+                  disabled={checking || submitting || !enoughScooters || totalDays < 1}
                   className="mt-8 flex w-full items-center justify-between rounded-full bg-[#49372D] px-7 py-5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#FFFDF8] transition hover:bg-[#6F7F73] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <span>{submitting ? "Submitting your request..." : "Continue to WhatsApp"}</span>
@@ -541,7 +554,7 @@ function ReservationForm() {
 
               <div className="flex items-center justify-between gap-4">
                 <span className="text-xs font-medium text-[#6F7F73]">
-                  Daily rate
+                  Daily rate per scooter
                 </span>
 
                 <span className="text-sm font-bold">
@@ -562,6 +575,7 @@ function ReservationForm() {
               </div>
             </div>
 
+            <p className="mt-5 text-sm font-bold">{scooterQuantity} scooter(s) × {totalDays} day(s) × {dailyRate} DH</p>
             <div className="mt-7 flex items-end justify-between gap-4">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#6F7F73]">

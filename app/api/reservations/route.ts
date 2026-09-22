@@ -25,12 +25,6 @@ function getRentalDays(startDate: string, endDate: string): number {
   return Math.round((end - start) / 86400000) + 1;
 }
 
-function getNextDay(value: string): string {
-  const date = new Date(`${value}T00:00:00.000Z`);
-  date.setUTCDate(date.getUTCDate() + 1);
-
-  return date.toISOString().slice(0, 10);
-}
 
 function getDailyPrice(days: number): number {
   if (days >= 30) return 120;
@@ -59,6 +53,8 @@ function getMoroccoToday(): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const quantity = body.scooter_quantity === undefined ? 1 : body.scooter_quantity;
+    if (typeof quantity !== 'number' || !Number.isSafeInteger(quantity) || quantity < 1 || quantity > 10000) return NextResponse.json({ success: false, message: 'Choose a valid number of scooters.' }, { status: 400 });
 
     // 1. Read customer information
     const customerName = String(body.customer_name ?? "").trim();
@@ -160,100 +156,15 @@ export async function POST(request: NextRequest) {
     const { error: expiryError } = await supabaseAdmin.rpc("ec_paypal_expire");
     if (expiryError) throw new Error("Unable to release expired checkouts");
 
-    // 4. Get the total number of scooters
-    const { data: settings, error: settingsError } =
-      await supabaseAdmin
-        .from("settings")
-        .select("total_scooters")
-        .order("id", { ascending: true })
-        .limit(1)
-        .single();
-
-    if (settingsError || !settings) {
-      console.error("SUPABASE SETTINGS ERROR:", settingsError);
-
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unable to load scooter availability.",
-        },
-        { status: 500 }
-      );
-    }
-
-    const totalScooters = Number(settings.total_scooters);
-
-    if (!Number.isInteger(totalScooters) || totalScooters < 1) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Scooter capacity is not configured correctly.",
-        },
-        { status: 500 }
-      );
-    }
-
-    // 5. Get reservations overlapping the selected dates
-    const { data: existingReservations, error: reservationsError } =
-      await supabaseAdmin
-        .from("reservations")
-        .select("start_date, end_date")
-        .in("status", ["pending", "confirmed"])
-        .lte("start_date", endDate)
-        .gte("end_date", startDate)
-        .limit(10000);
-
-    if (reservationsError) {
-      console.error(
-        "SUPABASE AVAILABILITY ERROR:",
-        reservationsError
-      );
-
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unable to check availability. Please try again.",
-        },
-        { status: 500 }
-      );
-    }
-
-    if ((existingReservations ?? []).length === 10000) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unable to verify availability. Please contact us.",
-        },
-        { status: 503 }
-      );
-    }
-
-    // 6. Check that every day has at least one free scooter
-    for (
-      let date = startDate;
-      date <= endDate;
-      date = getNextDay(date)
-    ) {
-      const bookedScooters = (existingReservations ?? []).filter(
-        (reservation) =>
-          reservation.start_date <= date &&
-          reservation.end_date >= date
-      ).length;
-
-      if (bookedScooters >= totalScooters) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: `No scooters are available on ${date}. Please select another rental period.`,
-          },
-          { status: 409 }
-        );
-      }
-    }
+    // Aggregated availability has no reservation-row pagination limit.
+    const { data: days, error: availabilityError } = await supabaseAdmin.rpc('ec_availability', { p_start: startDate, p_end: endDate });
+    if (availabilityError || !days || days.length !== totalDays) throw new Error('Unable to check availability');
+    if (days.some((day: { available_scooters: number }) => day.available_scooters < quantity)) return NextResponse.json({ success: false, message: 'Not enough scooters for these dates. Reduce the quantity or choose another period.' }, { status: 409 });
 
     // 7. Calculate price on the server
     const dailyPrice = getDailyPrice(totalDays);
-    const totalPrice = dailyPrice * totalDays;
+    const totalPrice = dailyPrice * totalDays * quantity;
+    if (totalPrice > 99999999.99) return NextResponse.json({ success: false, message: "Please contact us for this group booking." }, { status: 400 });
 
     // 8. Save booking request in Supabase
     const { data: reservation, error: insertError } =
@@ -266,6 +177,7 @@ export async function POST(request: NextRequest) {
           start_date: startDate,
           end_date: endDate,
           total_days: totalDays,
+          scooter_quantity: quantity,
           total_price: totalPrice,
           status: "pending",
           payment_method: "cash",
@@ -292,6 +204,7 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         reservationId: reservation.id,
+        scooterQuantity: quantity,
         totalDays,
         dailyPrice,
         totalPrice,
